@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum BloodType {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
+model Donor {
+  id          String     @id @default(uuid())
+  nationalId  String     @unique
+  name        String
+  phone       String
+  address     String?
+  dateOfBirth DateTime?
+  bloodType   BloodType?
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  campaigns   DonorCampaign[]
+}
+
+model Campaign {
+  id              String   @id @default(uuid())
+  campaignNumber  Int      @unique
+  startDate       DateTime
+  endDate         DateTime?
+
+  bloodBankName   String?
+  supervisorName  String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  donors          DonorCampaign[]
+}
+
+model DonorCampaign {
+  id           String   @id @default(uuid())
+
+  donorId      String
+  campaignId   String
+
+  registeredAt DateTime @default(now())
+  donatedAt    DateTime?
+  offlineSyncId  String   @unique
+
+  donor        Donor    @relation(fields: [donorId], references: [id])
+  campaign     Campaign @relation(fields: [campaignId], references: [id])
+
+  @@unique([donorId, campaignId])
+}

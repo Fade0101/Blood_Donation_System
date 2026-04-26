@@ -1,0 +1,644 @@
+{
+  "info": {
+    "_postman_id": "blood-donation-system-api",
+    "name": "Blood Donation System API",
+    "description": "Complete API documentation for the Blood Donation Campaign Platform backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Donors",
+      "item": [
+        {
+          "name": "Get All Donors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/donors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "donors"]
+            },
+            "description": "Retrieve all donors sorted by creation date (newest first)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/donors",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "donors"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"nationalId\": \"12345678901234\",\n    \"name\": \"Ahmed Hassan\",\n    \"phone\": \"+966501234567\",\n    \"address\": \"Riyadh, Saudi Arabia\",\n    \"dateOfBirth\": \"1990-05-15T00:00:00.000Z\",\n    \"bloodType\": \"A_POS\",\n    \"createdAt\": \"2024-04-26T10:30:00.000Z\",\n    \"updatedAt\": \"2024-04-26T10:30:00.000Z\",\n    \"age\": 34\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Donor by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/donors/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "donors", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            },
+            "description": "Retrieve a specific donor by their UUID"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/donors/550e8400-e29b-41d4-a716-446655440000",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "donors", "550e8400-e29b-41d4-a716-446655440000"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+966501234567\",\n  \"address\": \"Riyadh\",\n  \"dateOfBirth\": \"1990-05-15T00:00:00.000Z\",\n  \"bloodType\": \"A_POS\",\n  \"createdAt\": \"2024-04-26T10:30:00.000Z\",\n  \"updatedAt\": \"2024-04-26T10:30:00.000Z\",\n  \"age\": 34\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/donors/invalid-id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "donors", "invalid-id"]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"error\": \"Donor not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Donor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+966501234567\",\n  \"address\": \"Riyadh, Saudi Arabia\",\n  \"dateOfBirth\": \"1990-05-15T00:00:00Z\",\n  \"bloodType\": \"A_POS\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/donors",
+              "host": ["{{base_url}}"],
+              "path": ["api", "donors"]
+            },
+            "description": "Create a new donor. nationalId must be exactly 14 characters and unique."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+966501234567\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/donors",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "donors"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+966501234567\",\n  \"address\": null,\n  \"dateOfBirth\": null,\n  \"bloodType\": null,\n  \"createdAt\": \"2024-04-26T10:30:00.000Z\",\n  \"updatedAt\": \"2024-04-26T10:30:00.000Z\",\n  \"age\": null\n}"
+            },
+            {
+              "name": "Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nationalId\": \"123\",\n  \"name\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/donors",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "donors"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"error\": \"Validation failed\",\n  \"details\": {\n    \"nationalId\": \"National ID must be exactly 14 characters\",\n    \"name\": \"Name is required\",\n    \"phone\": \"Phone is required\"\n  }\n}"
+            },
+            {
+              "name": "Duplicate National ID",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Another Person\",\n  \"phone\": \"+966501234568\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/donors",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "donors"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "body": "{\n  \"error\": \"A donor with this national ID already exists\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Donor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+966502222222\",\n  \"address\": \"Jeddah, Saudi Arabia\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/donors/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "donors", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            },
+            "description": "Update donor information (partial updates supported). All fields are optional."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone\": \"+966502222222\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/donors/550e8400-e29b-41d4-a716-446655440000",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "donors", "550e8400-e29b-41d4-a716-446655440000"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+966502222222\",\n  \"address\": \"Riyadh\",\n  \"dateOfBirth\": \"1990-05-15T00:00:00.000Z\",\n  \"bloodType\": \"A_POS\",\n  \"createdAt\": \"2024-04-26T10:30:00.000Z\",\n  \"updatedAt\": \"2024-04-26T10:35:00.000Z\",\n  \"age\": 34\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Donor",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/donors/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "donors", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            },
+            "description": "Delete a donor permanently"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/donors/550e8400-e29b-41d4-a716-446655440000",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "donors", "550e8400-e29b-41d4-a716-446655440000"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Campaigns",
+      "item": [
+        {
+          "name": "Get All Campaigns",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/campaigns",
+              "host": ["{{base_url}}"],
+              "path": ["api", "campaigns"]
+            },
+            "description": "Retrieve all campaigns sorted by creation date (newest first)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/campaigns",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "campaigns"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": \"660e8400-e29b-41d4-a716-446655440001\",\n    \"campaignNumber\": 1,\n    \"startDate\": \"2024-04-26T00:00:00.000Z\",\n    \"endDate\": \"2024-05-26T00:00:00.000Z\",\n    \"bloodBankName\": \"Central Blood Bank\",\n    \"supervisorName\": \"Dr. Mohammed\",\n    \"createdAt\": \"2024-04-26T10:00:00.000Z\",\n    \"updatedAt\": \"2024-04-26T10:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Campaign by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/campaigns/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "campaigns", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              ]
+            },
+            "description": "Retrieve a specific campaign by UUID"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/campaigns/660e8400-e29b-41d4-a716-446655440001",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "campaigns", "660e8400-e29b-41d4-a716-446655440001"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": \"660e8400-e29b-41d4-a716-446655440001\",\n  \"campaignNumber\": 1,\n  \"startDate\": \"2024-04-26T00:00:00.000Z\",\n  \"endDate\": \"2024-05-26T00:00:00.000Z\",\n  \"bloodBankName\": \"Central Blood Bank\",\n  \"supervisorName\": \"Dr. Mohammed\",\n  \"createdAt\": \"2024-04-26T10:00:00.000Z\",\n  \"updatedAt\": \"2024-04-26T10:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campaignNumber\": 1,\n  \"startDate\": \"2024-04-26T00:00:00Z\",\n  \"endDate\": \"2024-05-26T00:00:00Z\",\n  \"bloodBankName\": \"Central Blood Bank\",\n  \"supervisorName\": \"Dr. Mohammed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/campaigns",
+              "host": ["{{base_url}}"],
+              "path": ["api", "campaigns"]
+            },
+            "description": "Create a new campaign. Campaign number must be unique and positive."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"campaignNumber\": 1,\n  \"startDate\": \"2024-04-26T00:00:00Z\",\n  \"endDate\": \"2024-05-26T00:00:00Z\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/campaigns",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "campaigns"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"id\": \"660e8400-e29b-41d4-a716-446655440001\",\n  \"campaignNumber\": 1,\n  \"startDate\": \"2024-04-26T00:00:00.000Z\",\n  \"endDate\": \"2024-05-26T00:00:00.000Z\",\n  \"bloodBankName\": null,\n  \"supervisorName\": null,\n  \"createdAt\": \"2024-04-26T10:00:00.000Z\",\n  \"updatedAt\": \"2024-04-26T10:00:00.000Z\"\n}"
+            },
+            {
+              "name": "Duplicate Campaign Number",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"campaignNumber\": 1,\n  \"startDate\": \"2024-05-01T00:00:00Z\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/campaigns",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "campaigns"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "body": "{\n  \"error\": \"Campaign number already exists\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Campaign",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bloodBankName\": \"New Blood Bank\",\n  \"supervisorName\": \"Dr. Ali\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/campaigns/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "campaigns", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              ]
+            },
+            "description": "Update campaign details (partial updates supported)"
+          }
+        },
+        {
+          "name": "Delete Campaign",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/campaigns/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "campaigns", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              ]
+            },
+            "description": "Delete a campaign permanently"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Campaign Operations",
+      "item": [
+        {
+          "name": "Register Donor to Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+966501234567\",\n  \"address\": \"Riyadh\",\n  \"offlineSyncId\": \"sync-123-abc\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/campaigns/:campaignId/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "campaigns", ":campaignId", "register"],
+              "variable": [
+                {
+                  "key": "campaignId",
+                  "value": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              ]
+            },
+            "description": "Register a donor to a campaign. If donor doesn't exist, creates them. Uses smart registration logic with transaction support.\n\n**Smart Registration Logic:**\n- If nationalId found: links existing donor\n- If not found + full details (name, phone) provided: creates new donor\n- If not found + missing details: throws error\n- If found + new details provided: updates donor info\n- offlineSyncId: auto-generated if not provided"
+          },
+          "response": [
+            {
+              "name": "Success - New Donor",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+966501234567\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/campaigns/660e8400-e29b-41d4-a716-446655440001/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "campaigns", "660e8400-e29b-41d4-a716-446655440001", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"donor\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"nationalId\": \"12345678901234\",\n    \"name\": \"Ahmed Hassan\",\n    \"phone\": \"+966501234567\",\n    \"address\": null,\n    \"dateOfBirth\": null,\n    \"bloodType\": null,\n    \"createdAt\": \"2024-04-26T10:30:00.000Z\",\n    \"updatedAt\": \"2024-04-26T10:30:00.000Z\"\n  },\n  \"registration\": {\n    \"id\": \"770e8400-e29b-41d4-a716-446655440002\",\n    \"donorId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"campaignId\": \"660e8400-e29b-41d4-a716-446655440001\",\n    \"registeredAt\": \"2024-04-26T10:30:00.000Z\",\n    \"donatedAt\": null,\n    \"offlineSyncId\": \"auto-generated-uuid\"\n  }\n}"
+            },
+            {
+              "name": "Success - Existing Donor",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"phone\": \"+966502222222\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/campaigns/660e8400-e29b-41d4-a716-446655440001/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "campaigns", "660e8400-e29b-41d4-a716-446655440001", "register"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"donor\": {\n    \"id\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"nationalId\": \"12345678901234\",\n    \"name\": \"Ahmed Hassan\",\n    \"phone\": \"+966502222222\",\n    \"address\": null,\n    \"dateOfBirth\": null,\n    \"bloodType\": null,\n    \"createdAt\": \"2024-04-26T10:30:00.000Z\",\n    \"updatedAt\": \"2024-04-26T10:35:00.000Z\"\n  },\n  \"registration\": {\n    \"id\": \"780e8400-e29b-41d4-a716-446655440003\",\n    \"donorId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"campaignId\": \"660e8400-e29b-41d4-a716-446655440001\",\n    \"registeredAt\": \"2024-04-26T10:35:00.000Z\",\n    \"donatedAt\": null,\n    \"offlineSyncId\": \"auto-generated-uuid\"\n  }\n}"
+            },
+            {
+              "name": "Error - Duplicate Registration",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+966501234567\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/campaigns/660e8400-e29b-41d4-a716-446655440001/register",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "campaigns", "660e8400-e29b-41d4-a716-446655440001", "register"]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"error\": \"المتبرع مسجل بالفعل في هذه الحملة.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Export Campaign Donors as CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/campaigns/:campaignId/export?bloodType=A_POS",
+              "host": ["{{base_url}}"],
+              "path": ["api", "campaigns", ":campaignId", "export"],
+              "query": [
+                {
+                  "key": "bloodType",
+                  "value": "A_POS",
+                  "disabled": false
+                }
+              ],
+              "variable": [
+                {
+                  "key": "campaignId",
+                  "value": "660e8400-e29b-41d4-a716-446655440001"
+                }
+              ]
+            },
+            "description": "Export campaign donors as CSV file. Optional bloodType filter (A_POS, A_NEG, B_POS, B_NEG, AB_POS, AB_NEG, O_POS, O_NEG)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/campaigns/660e8400-e29b-41d4-a716-446655440001/export",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "campaigns", "660e8400-e29b-41d4-a716-446655440001", "export"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/csv; charset=utf-8"
+                },
+                {
+                  "key": "Content-Disposition",
+                  "value": "attachment; filename=campaign_1_donors.csv"
+                }
+              ],
+              "body": "\"National ID\",\"Name\",\"Phone\",\"Address\",\"Blood Type\",\"Registration Date\"\n\"12345678901234\",\"Ahmed Hassan\",\"+966501234567\",\"Riyadh\",\"A_POS\",\"2024-04-26\"\n\"98765432109876\",\"Fatima Mohammed\",\"+966502222222\",\"Jeddah\",\"O_POS\",\"2024-04-26\""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}
