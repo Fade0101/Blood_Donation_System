@@ -1,0 +1,63 @@
+<nav class="backdrop-blur-md bg-red-900/80 text-white shadow-lg fixed w-full z-50">
+
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-2 cursor-pointer hover:scale-105 transition">
+        <i class="fa-solid fa-hand-holding-droplet text-2xl text-white animate-pulse"></i>
+        <span class="font-bold text-xl tracking-wide">
+          تبرع دم حبشي
+        </span>
+      </div>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center gap-8">
+
+        <a routerLink="/home" 
+        class="hover:text-gray-200 transition hover:-translate-y-1 duration-300 flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-house"></i>
+          الرئيسية
+        </a>
+
+        <a routerLink="/donors"
+          class="hover:text-gray-200 transition hover:-translate-y-1 duration-300 flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-users"></i>
+          المتبرعين
+        </a>
+
+        <a class="hover:text-gray-200 transition hover:-translate-y-1 duration-300 flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-bullhorn"></i>
+          الحملات
+        </a>
+
+        <a class="hover:text-gray-200 transition hover:-translate-y-1 duration-300 flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-chart-line"></i>
+          الإحصائيات
+        </a>
+
+      </div>
+
+      <!-- Right Actions -->
+      <div class="flex items-center gap-4">
+
+        <button
+          class="bg-white text-red-700 px-3 py-1 rounded-lg font-semibold hover:bg-gray-200 transition hover:scale-105">
+          <i class="fa-solid fa-plus"></i>
+          حملة جديدة
+        </button>
+
+        <!-- Mobile button -->
+        <button class="md:hidden text-xl">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom glow line -->
+  <div class="h-[2px] bg-white/20"></div>
+
+</nav>

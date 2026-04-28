@@ -1,0 +1,398 @@
+<div class="min-h-screen bg-white py-22 flex justify-center items-start" dir="rtl">
+
+  <div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+
+    <div class="bg-gray-50 rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100">
+
+      <!-- Header -->
+      <div class="mb-10 bg-white rounded-3xl shadow-xl border border-red-100 overflow-hidden">
+        <div class="p-8 bg-gradient-to-l from-red-50 to-white">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+
+            <div>
+              <h2 class="text-2xl font-bold text-red-700 flex items-center gap-2">
+                <i class="fa-solid fa-users"></i>
+                قائمة المتبرعين
+              </h2>
+              <p class="text-sm text-gray-500 mt-2">ابحث عن المتبرع بالاسم</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-3">
+
+              <!-- Search -->
+              <div class="relative w-full sm:w-auto">
+                <input
+                  type="text"
+                  placeholder="ابحث بالاسم..."
+                  (input)="onSearch($event)"
+                  class="w-full sm:w-80 pr-12 pl-4 py-3 rounded-2xl border border-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white shadow-sm transition-all duration-300"
+                />
+                <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-red-400"></i>
+              </div>
+
+              <!-- Add Button -->
+              <button
+                (click)="openModal()"
+                class="bg-green-600 text-white px-6 py-3 rounded-2xl hover:bg-green-700 transition-all duration-300 hover:scale-105 shadow-md"
+              >
+                <i class="fa-solid fa-plus ml-2"></i>
+                إضافة متبرع
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+
+        <div class="stat-card">
+          <p>إجمالي المتبرعين</p>
+          <h2>{{ donors.length }}</h2>
+        </div>
+
+        <div class="stat-card">
+          <p>A+</p>
+          <h2>{{ count('A_POS') }}</h2>
+        </div>
+
+        <div class="stat-card">
+          <p>O+</p>
+          <h2>{{ count('O_POS') }}</h2>
+        </div>
+
+        <div class="stat-card">
+          <p>AB+</p>
+          <h2>{{ count('AB_POS') }}</h2>
+        </div>
+
+      </div>
+
+      <!-- Blood Filter + Legend -->
+      <div class="mb-6 bg-white rounded-2xl p-5 shadow-sm border border-red-100">
+
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-red-700 flex items-center gap-2">
+            <i class="fa-solid fa-droplet"></i>
+            فلترة حسب فصيلة الدم
+          </h3>
+
+          <button
+            (click)="filterByBlood('ALL')"
+            class="text-sm text-red-600 hover:text-red-800 font-medium"
+          >
+            عرض الكل
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+
+          <button
+            class="blood-pill blood-a-pos"
+            [class.active-filter]="selectedBloodFilter() === 'A_POS'"
+            (click)="filterByBlood('A_POS')"
+          >
+            A+
+          </button>
+
+          <button
+            class="blood-pill blood-a-neg"
+            [class.active-filter]="selectedBloodFilter() === 'A_NEG'"
+            (click)="filterByBlood('A_NEG')"
+          >
+            A-
+          </button>
+
+          <button
+            class="blood-pill blood-b-pos"
+            [class.active-filter]="selectedBloodFilter() === 'B_POS'"
+            (click)="filterByBlood('B_POS')"
+          >
+            B+
+          </button>
+
+          <button
+            class="blood-pill blood-b-neg"
+            [class.active-filter]="selectedBloodFilter() === 'B_NEG'"
+            (click)="filterByBlood('B_NEG')"
+          >
+            B-
+          </button>
+
+          <button
+            class="blood-pill blood-ab-pos"
+            [class.active-filter]="selectedBloodFilter() === 'AB_POS'"
+            (click)="filterByBlood('AB_POS')"
+          >
+            AB+
+          </button>
+
+          <button
+            class="blood-pill blood-ab-neg"
+            [class.active-filter]="selectedBloodFilter() === 'AB_NEG'"
+            (click)="filterByBlood('AB_NEG')"
+          >
+            AB-
+          </button>
+
+          <button
+            class="blood-pill blood-o-pos"
+            [class.active-filter]="selectedBloodFilter() === 'O_POS'"
+            (click)="filterByBlood('O_POS')"
+          >
+            O+
+          </button>
+
+          <button
+            class="blood-pill blood-o-neg"
+            [class.active-filter]="selectedBloodFilter() === 'O_NEG'"
+            (click)="filterByBlood('O_NEG')"
+          >
+            O-
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white shadow-2xl rounded-3xl overflow-hidden border border-red-100">
+        <div class="overflow-x-auto">
+
+          <table class="w-full text-sm text-right">
+
+ <thead class="bg-red-700 text-white">
+  <tr>
+    <th class="p-5 whitespace-nowrap">الاسم</th>
+    <th class="p-5 whitespace-nowrap">رقم الهاتف</th>
+    <th class="p-5 whitespace-nowrap">الرقم القومي</th>
+    <th class="p-5 whitespace-nowrap">فصيلة الدم</th>
+    <th class="p-5 whitespace-nowrap">تاريخ الميلاد</th>
+    <th class="p-5 whitespace-nowrap">العنوان</th>
+    <th class="p-5 text-center whitespace-nowrap">الإجراءات</th>
+  </tr>
+</thead>
+
+        <tbody>
+
+@for (d of filteredDonors(); track d.id) {
+
+<tr class="border-b hover:bg-red-50 transition-all duration-300">
+
+  <!-- NAME -->
+  <td class="p-5 font-semibold text-gray-700">
+    {{ d.name }}
+  </td>
+
+  <!-- PHONE -->
+  <td class="p-5 text-gray-600">
+    {{ d.phone }}
+  </td>
+
+  <!-- NATIONAL ID -->
+  <td class="p-5 text-gray-600">
+    {{ d.nationalId }}
+  </td>
+
+  <!-- BLOOD TYPE -->
+  <td class="p-5">
+    <span class="blood-pill" [ngClass]="getBloodClass(d.bloodType)">
+      {{ d.bloodType }}
+    </span>
+  </td>
+
+  <!-- DOB -->
+  <td class="p-5 text-gray-600">
+    {{ d.dateOfBirth ? (d.dateOfBirth | date:'yyyy-MM-dd') : '-' }}
+  </td>
+
+  <!-- ADDRESS -->
+  <td class="p-5 text-gray-600">
+    {{ d.address || '-' }}
+  </td>
+
+  <!-- ACTIONS -->
+  <td class="p-5">
+    <div class="flex justify-center gap-2">
+
+      <button
+        (click)="openEditModal(d)"
+        class="bg-blue-100 text-blue-600 px-3 py-2 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 shadow-sm"
+      >
+        <i class="fa-solid fa-pen"></i>
+      </button>
+
+      <button
+        (click)="deleteDonor(d.id)"
+        class="bg-red-100 text-red-600 px-3 py-2 rounded-xl hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm"
+      >
+        <i class="fa-solid fa-trash"></i>
+      </button>
+
+    </div>
+  </td>
+
+</tr>
+
+} @empty {
+
+<tr>
+  <td colspan="7" class="text-center p-12 text-gray-500 italic">
+    <i class="fa-solid fa-folder-open block text-3xl mb-3 opacity-20"></i>
+    لا يوجد متبرعين حالياً
+  </td>
+</tr>
+
+}
+
+</tbody>
+
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+@if (showModal) {
+
+<div class="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+
+  <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl p-8 relative">
+
+    <!-- Close -->
+    <button
+      (click)="closeModal()"
+      class="absolute top-4 left-4 text-gray-500 hover:text-red-600"
+    >
+      ✖
+    </button>
+
+    <!-- Title -->
+    <h2 class="text-2xl font-bold text-red-700 mb-6">
+      {{ isEditMode ? 'تعديل متبرع' : 'إضافة متبرع جديد' }}
+    </h2>
+
+    <!-- Form -->
+ <form
+  [formGroup]="donorForm"
+  (ngSubmit)="saveDonor()"
+  class="grid grid-cols-1 md:grid-cols-2 gap-5"
+>
+
+  <!-- NAME -->
+  <div>
+    <label class="label">الاسم</label>
+    <input
+      formControlName="name"
+      class="input"
+      [class.input-error]="donorForm.get('name')?.invalid && donorForm.get('name')?.touched"
+      placeholder="أدخل الاسم"
+    />
+    @if (donorForm.get('name')?.touched && donorForm.get('name')?.invalid) {
+      <div class="error-text">الاسم مطلوب</div>
+    }
+  </div>
+
+  <!-- PHONE -->
+  <div>
+    <label class="label">رقم الهاتف</label>
+    <input
+      formControlName="phone"
+      class="input"
+      [class.input-error]="donorForm.get('phone')?.invalid && donorForm.get('phone')?.touched"
+      placeholder="01xxxxxxxxx"
+    />
+    @if (donorForm.get('phone')?.touched && donorForm.get('phone')?.invalid) {
+      <div class="error-text">رقم الهاتف مطلوب</div>
+    }
+  </div>
+
+  <!-- NATIONAL ID -->
+  <div>
+    <label class="label">الرقم القومي</label>
+    <input
+      formControlName="nationalId"
+      class="input"
+      [class.input-error]="donorForm.get('nationalId')?.invalid && donorForm.get('nationalId')?.touched"
+      placeholder="14 رقم"
+    />
+    @if (donorForm.get('nationalId')?.touched && donorForm.get('nationalId')?.invalid) {
+      <div class="error-text">
+        الرقم القومي لازم يكون 14 رقم
+      </div>
+    }
+  </div>
+
+  <!-- BLOOD TYPE -->
+  <div>
+    <label class="label">فصيلة الدم</label>
+    <select
+      formControlName="bloodType"
+      class="input"
+    >
+      <option value="">اختار الفصيلة</option>
+      <option value="A_POS">A+</option>
+      <option value="A_NEG">A-</option>
+      <option value="B_POS">B+</option>
+      <option value="B_NEG">B-</option>
+      <option value="AB_POS">AB+</option>
+      <option value="AB_NEG">AB-</option>
+      <option value="O_POS">O+</option>
+      <option value="O_NEG">O-</option>
+    </select>
+  </div>
+
+  <!-- DATE -->
+  <div>
+    <label class="label">تاريخ الميلاد</label>
+    <input
+      type="date"
+      formControlName="dateOfBirth"
+      class="input"
+    />
+  </div>
+
+  <!-- ADDRESS -->
+  <div>
+    <label class="label">العنوان</label>
+    <input formControlName="address" class="input" placeholder="العنوان" />
+  </div>
+
+  <!-- CHURCH -->
+  <div>
+    <label class="label">الكنيسة</label>
+    <input formControlName="church" class="input" placeholder="الكنيسة" />
+  </div>
+
+  <!-- CONFESSION FATHER -->
+  <div class="md:col-span-2">
+    <label class="label">أب الاعتراف</label>
+    <input
+      formControlName="confessionFather"
+      class="input"
+      placeholder="أب الاعتراف"
+    />
+  </div>
+
+  <!-- BUTTON -->
+  <div class="md:col-span-2">
+    <button
+      type="submit"
+      class="btn-primary w-full"
+      [disabled]="donorForm.invalid"
+    >
+      {{ isEditMode ? 'تحديث المتبرع' : 'إضافة متبرع' }}
+    </button>
+  </div>
+
+</form>
+
+  </div>
+
+</div>
+
+}
