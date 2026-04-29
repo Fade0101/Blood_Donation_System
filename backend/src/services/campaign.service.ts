@@ -69,12 +69,12 @@ export const campaignService = {
     }
 
     const flatData = records.map((record) => ({
-      "National ID": record.donor.nationalId,
-      Name: record.donor.name,
-      Phone: record.donor.phone,
-      Address: record.donor.address || "N/A",
-      "Blood Type": record.donor.bloodType || "Unknown",
-      "Registration Date": record.registeredAt.toISOString().split("T")[0],
+      "National ID": ` ${record.donor.nationalId}`, 
+    "Name": record.donor.name,
+    "Phone": ` ${record.donor.phone}`,
+    "Address": record.donor.address || "N/A",
+    "Blood Type": record.donor.bloodType || "Unknown",
+    "Registration Date": record.registeredAt.toISOString().split('T')[0]
     }));
 
     const json2csvParser = new Parser();

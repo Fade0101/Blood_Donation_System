@@ -1,0 +1,291 @@
+
+> backend@1.0.0 dev
+> ts-node-dev --respawn --transpile-only src/server.ts
+
+[INFO] 01:36:10 ts-node-dev ver. 2.0.0 (using ts-node ver. 10.9.2, typescript ver. 6.0.3)
+Database connected successfully
+Server running on port 5000
+[INFO] 03:09:38 Restarting: E:\Blood Donation System\backend\src\routes\campaign.routes.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:09:42 Restarting: E:\Blood Donation System\backend\src\routes\campaign.routes.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:09:49 Restarting: E:\Blood Donation System\backend\src\routes\campaign.routes.ts has been modified
+ReferenceError: validateData is not defined
+    at Object.<anonymous> (E:\Blood Donation System\backend\src\routes\campaign.routes.ts:36:8)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1730:14)
+    at Module._compile (E:\Blood Donation System\backend\node_modules\source-map-support\source-map-support.js:568:25)
+    at Module.m._compile (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:69:33)
+    at node:internal/modules/cjs/loader:1895:10
+    at require.extensions..jsx.require.extensions..js (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:114:20)
+    at require.extensions.<computed> (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:71:20)
+    at Object.nodeDevHook [as .ts] (E:\Blood Donation System\backend\node_modules\ts-node-dev\lib\hook.js:63:13)
+    at Module.load (node:internal/modules/cjs/loader:1465:32)
+    at Function._load (node:internal/modules/cjs/loader:1282:12)
+[ERROR] 03:09:51 ReferenceError: validateData is not defined
+[INFO] 03:09:59 Restarting: E:\Blood Donation System\backend\src\routes\campaign.routes.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:10:01 Restarting: E:\Blood Donation System\backend\src\routes\campaign.routes.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:10:02 Restarting: E:\Blood Donation System\backend\src\routes\campaign.routes.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:15:01 Restarting: E:\Blood Donation System\backend\src\services\import.service.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:15:37 Restarting: E:\Blood Donation System\backend\src\services\import.service.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:23:13 Reinitializing TS compilation
+[INFO] 03:23:13 Restarting: E:\Blood Donation System\backend\tsconfig.json has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:23:51 Reinitializing TS compilation
+[INFO] 03:23:51 Restarting: E:\Blood Donation System\backend\tsconfig.json has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:32:17 Restarting: E:\Blood Donation System\backend\src\types\campaign.types.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:33:12 Restarting: E:\Blood Donation System\backend\src\routes\campaign.routes.ts has been modified
+Database connected successfully
+Server running on port 5000
+Error: المتبرع مسجل بالفعل في هذه الحملة.
+    at E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:58:13
+    at Proxy._transactionWithCallback (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at registerDonorToCampaign (E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:10:10)
+    at Object.registerDonor (E:\Blood Donation System\backend\src\services\campaign.service.ts:21:12)
+    at registerDonor (E:\Blood Donation System\backend\src\controllers\campaign.controller.ts:32:20)
+Error: المتبرع مسجل بالفعل في هذه الحملة.
+    at E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:58:13
+    at Proxy._transactionWithCallback (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at registerDonorToCampaign (E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:10:10)
+    at Object.registerDonor (E:\Blood Donation System\backend\src\services\campaign.service.ts:21:12)
+    at registerDonor (E:\Blood Donation System\backend\src\controllers\campaign.controller.ts:32:20)
+[INFO] 03:46:21 Restarting: E:\Blood Donation System\backend\src\controllers\sync.controller.ts has been modified
+Database connected successfully
+Server running on port 5000
+TypeError: Cannot read properties of undefined (reading 'parse')
+    at handleOfflineSync (E:\Blood Donation System\backend\src\controllers\sync.controller.ts:9:49)
+    at Layer.handleRequest (E:\Blood Donation System\backend\node_modules\router\lib\layer.js:152:17)
+    at next (E:\Blood Donation System\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (E:\Blood Donation System\backend\node_modules\router\lib\route.js:117:3)
+    at handle (E:\Blood Donation System\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (E:\Blood Donation System\backend\node_modules\router\lib\layer.js:152:17)
+    at E:\Blood Donation System\backend\node_modules\router\index.js:295:15
+    at processParams (E:\Blood Donation System\backend\node_modules\router\index.js:582:12)
+    at next (E:\Blood Donation System\backend\node_modules\router\index.js:291:5)
+    at Function.handle (E:\Blood Donation System\backend\node_modules\router\index.js:186:3)
+[INFO] 03:47:24 Restarting: E:\Blood Donation System\backend\src\routes\sync.routes.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:49:46 Restarting: E:\Blood Donation System\backend\src\types\sync.types.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:51:18 Reinitializing TS compilation
+[INFO] 03:51:18 Restarting: E:\Blood Donation System\backend\tsconfig.json has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 03:52:54 Reinitializing TS compilation
+[INFO] 03:52:54 Restarting: E:\Blood Donation System\backend\tsconfig.json has been modified
+Database connected successfully
+Server running on port 5000
+PrismaClientUnknownRequestError: 
+Invalid `prisma.donor.delete()` invocation in
+E:\Blood Donation System\backend\src\repositories\donor.repository.ts:37:31
+
+  34 },
+  35 
+  36 delete(id: string) {
+→ 37   return prisma.donor.delete(
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23001", message: "update or delete on table \"Donor\" violates RESTRICT setting of foreign key constraint \"DonorCampaign_donorId_fkey\" on table \"DonorCampaign\"", severity: "ERROR", detail: Some("Key (id)=(85d01aca-8338-4fcb-a2e0-1e95731f8c15) is referenced from table \"DonorCampaign\"."), column: None, hint: None }), transient: false })
+    at $n.handleRequestError (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:7505)
+    at $n.handleAndLogRequestError (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at l (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at Object.deleteDonor (E:\Blood Donation System\backend\src\services\donor.service.ts:48:5)
+    at remove (E:\Blood Donation System\backend\src\controllers\donor.controller.ts:26:5) {
+  clientVersion: '5.22.0'
+}
+PrismaClientUnknownRequestError: 
+Invalid `prisma.donor.delete()` invocation in
+E:\Blood Donation System\backend\src\repositories\donor.repository.ts:37:31
+
+  34 },
+  35 
+  36 delete(id: string) {
+→ 37   return prisma.donor.delete(
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23001", message: "update or delete on table \"Donor\" violates RESTRICT setting of foreign key constraint \"DonorCampaign_donorId_fkey\" on table \"DonorCampaign\"", severity: "ERROR", detail: Some("Key (id)=(85d01aca-8338-4fcb-a2e0-1e95731f8c15) is referenced from table \"DonorCampaign\"."), column: None, hint: None }), transient: false })
+    at $n.handleRequestError (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:7505)
+    at $n.handleAndLogRequestError (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at l (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at Object.deleteDonor (E:\Blood Donation System\backend\src\services\donor.service.ts:48:5)
+    at remove (E:\Blood Donation System\backend\src\controllers\donor.controller.ts:26:5) {
+  clientVersion: '5.22.0'
+}
+PrismaClientUnknownRequestError: 
+Invalid `prisma.donor.delete()` invocation in
+E:\Blood Donation System\backend\src\repositories\donor.repository.ts:37:31
+
+  34 },
+  35 
+  36 delete(id: string) {
+→ 37   return prisma.donor.delete(
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23001", message: "update or delete on table \"Donor\" violates RESTRICT setting of foreign key constraint \"DonorCampaign_donorId_fkey\" on table \"DonorCampaign\"", severity: "ERROR", detail: Some("Key (id)=(85d01aca-8338-4fcb-a2e0-1e95731f8c15) is referenced from table \"DonorCampaign\"."), column: None, hint: None }), transient: false })
+    at $n.handleRequestError (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:7505)
+    at $n.handleAndLogRequestError (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at l (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at Object.deleteDonor (E:\Blood Donation System\backend\src\services\donor.service.ts:48:5)
+    at remove (E:\Blood Donation System\backend\src\controllers\donor.controller.ts:26:5) {
+  clientVersion: '5.22.0'
+}
+[INFO] 04:01:49 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+[INFO] 04:01:50 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+ReferenceError: w is not defined
+    at Object.<anonymous> (E:\Blood Donation System\backend\src\types\donor.types.ts:44:1)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1730:14)
+    at Module._compile (E:\Blood Donation System\backend\node_modules\source-map-support\source-map-support.js:568:25)
+    at Module.m._compile (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:69:33)
+    at node:internal/modules/cjs/loader:1895:10
+    at require.extensions..jsx.require.extensions..js (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:114:20)
+    at require.extensions.<computed> (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:71:20)
+    at Object.nodeDevHook [as .ts] (E:\Blood Donation System\backend\node_modules\ts-node-dev\lib\hook.js:63:13)
+    at Module.load (node:internal/modules/cjs/loader:1465:32)
+    at Function._load (node:internal/modules/cjs/loader:1282:12)
+[ERROR] 04:01:51 ReferenceError: w is not defined
+[INFO] 04:01:51 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 04:01:53 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+ReferenceError: ex is not defined
+    at Object.<anonymous> (E:\Blood Donation System\backend\src\types\donor.types.ts:44:1)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1730:14)
+    at Module._compile (E:\Blood Donation System\backend\node_modules\source-map-support\source-map-support.js:568:25)
+    at Module.m._compile (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:69:33)
+    at node:internal/modules/cjs/loader:1895:10
+    at require.extensions..jsx.require.extensions..js (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:114:20)
+    at require.extensions.<computed> (C:\Users\Hp\AppData\Local\Temp\ts-node-dev-hook-7210040418373551.js:71:20)
+    at Object.nodeDevHook [as .ts] (E:\Blood Donation System\backend\node_modules\ts-node-dev\lib\hook.js:63:13)
+    at Module.load (node:internal/modules/cjs/loader:1465:32)
+    at Function._load (node:internal/modules/cjs/loader:1282:12)
+[ERROR] 04:01:54 ReferenceError: ex is not defined
+[INFO] 04:01:55 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:01:56 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,1): error TS1128: Declaration or statement expected.
+
+[INFO] 04:01:58 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:01:59 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,1): error TS1128: Declaration or statement expected.
+
+[INFO] 04:02:00 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:00 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,1): error TS1128: Declaration or statement expected.
+
+[INFO] 04:02:02 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:03 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,14): error TS1110: Type expected.
+src/types/donor.types.ts(45,1): error TS1005: '=' expected.
+
+[INFO] 04:02:04 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:05 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,14): error TS1110: Type expected.
+src/types/donor.types.ts(45,1): error TS1005: '=' expected.
+
+[INFO] 04:02:06 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:07 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,15): error TS1110: Type expected.
+src/types/donor.types.ts(45,1): error TS1005: '=' expected.
+
+[INFO] 04:02:08 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:09 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,17): error TS1110: Type expected.
+src/types/donor.types.ts(45,1): error TS1005: '=' expected.
+
+[INFO] 04:02:11 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:11 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,19): error TS1110: Type expected.
+src/types/donor.types.ts(45,1): error TS1005: '=' expected.
+
+[INFO] 04:02:12 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:14 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(45,1): error TS1005: '}' expected.
+
+[INFO] 04:02:14 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 04:02:16 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+[ERROR] 04:02:17 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(45,1): error TS1005: '}' expected.
+
+[INFO] 04:02:18 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:19 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,23): error TS1110: Type expected.
+src/types/donor.types.ts(45,1): error TS1005: '=' expected.
+
+[INFO] 04:02:20 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:21 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,25): error TS1110: Type expected.
+src/types/donor.types.ts(45,1): error TS1005: '=' expected.
+
+[INFO] 04:02:24 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:25 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(44,24): error TS1110: Type expected.
+src/types/donor.types.ts(45,1): error TS1005: '=' expected.
+
+[INFO] 04:02:25 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:26 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(45,1): error TS1005: '}' expected.
+
+[INFO] 04:02:27 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 04:02:33 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Compilation error in E:\Blood Donation System\backend\src\types\donor.types.ts
+[ERROR] 04:02:34 ⨯ Unable to compile TypeScript:
+src/types/donor.types.ts(50,1): error TS1005: '}' expected.
+
+[INFO] 04:02:35 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Database connected successfully
+Server running on port 5000
+[INFO] 04:03:25 Restarting: E:\Blood Donation System\backend\src\types\donor.types.ts has been modified
+Database connected successfully
+Server running on port 5000
+Error: المتبرع مسجل بالفعل في هذه الحملة.
+    at E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:58:13
+    at Proxy._transactionWithCallback (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at registerDonorToCampaign (E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:10:10)
+    at Object.registerDonor (E:\Blood Donation System\backend\src\services\campaign.service.ts:21:12)
+    at registerDonor (E:\Blood Donation System\backend\src\controllers\campaign.controller.ts:32:20)
+Error: المتبرع مسجل بالفعل في هذه الحملة.
+    at E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:58:13
+    at Proxy._transactionWithCallback (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at registerDonorToCampaign (E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:10:10)
+    at Object.registerDonor (E:\Blood Donation System\backend\src\services\campaign.service.ts:21:12)
+    at registerDonor (E:\Blood Donation System\backend\src\controllers\campaign.controller.ts:32:20)
+Error: المتبرع مسجل بالفعل في هذه الحملة.
+    at E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:58:13
+    at Proxy._transactionWithCallback (E:\Blood Donation System\backend\node_modules\@prisma\client\runtime\library.js:130:8000)
+    at registerDonorToCampaign (E:\Blood Donation System\backend\src\repositories\campaign.repository.ts:10:10)
+    at Object.registerDonor (E:\Blood Donation System\backend\src\services\campaign.service.ts:21:12)
+    at registerDonor (E:\Blood Donation System\backend\src\controllers\campaign.controller.ts:32:20)

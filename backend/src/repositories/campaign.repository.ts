@@ -25,7 +25,8 @@ export const registerDonorToCampaign = async (
           name: donorData.name,
           phone: donorData.phone,
           address: donorData.address || null,
-          dateOfBirth: donorData.dateOfBirth ? new Date(donorData.dateOfBirth) : null
+          dateOfBirth: donorData.dateOfBirth ? new Date(donorData.dateOfBirth) : null,
+          gender: donorData.gender || null
         }
       });
     } else {
@@ -33,6 +34,7 @@ export const registerDonorToCampaign = async (
       const updateData: any = {};
       if (donorData.phone && donorData.phone !== donor.phone) updateData.phone = donorData.phone;
       if (donorData.address && donorData.address !== donor.address) updateData.address = donorData.address;
+      if (donorData.gender && donorData.gender !== donor.gender) updateData.gender = donorData.gender;
 
       if (Object.keys(updateData).length > 0) {
         donor = await tx.donor.update({

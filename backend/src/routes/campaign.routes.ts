@@ -6,6 +6,8 @@ import {
   createCampaignSchema,
   updateCampaignSchema,
   campaignIdParamSchema,
+  campaignIdParamSchemaByName,
+  registerDonorSchema,
 } from "../types/campaign.types";
 
 const router = Router();
@@ -35,6 +37,8 @@ router.delete(
 
 router.post(
   "/:campaignId/register",
+  validateRequest(campaignIdParamSchemaByName, "params"),
+  validateRequest(registerDonorSchema, "body"),
   asyncHandler(campaignController.registerDonor)
 );
 router.get(

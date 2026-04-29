@@ -32,6 +32,11 @@ enum BloodType {
   O_NEG
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 model Donor {
   id          String     @id @default(uuid())
   nationalId  String     @unique
@@ -40,40 +45,41 @@ model Donor {
   address     String?
   dateOfBirth DateTime?
   bloodType   BloodType?
+  gender      Gender?
 
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  campaigns   DonorCampaign[]
+  campaigns DonorCampaign[]
 }
 
 model Campaign {
-  id              String   @id @default(uuid())
-  campaignNumber  Int      @unique
-  startDate       DateTime
-  endDate         DateTime?
+  id             String    @id @default(uuid())
+  campaignNumber Int       @unique
+  startDate      DateTime
+  endDate        DateTime?
 
-  bloodBankName   String?
-  supervisorName  String?
+  bloodBankName  String?
+  supervisorName String?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  donors          DonorCampaign[]
+  donors DonorCampaign[]
 }
 
 model DonorCampaign {
-  id           String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  donorId      String
-  campaignId   String
+  donorId    String
+  campaignId String
 
-  registeredAt DateTime @default(now())
-  donatedAt    DateTime?
-  offlineSyncId  String   @unique
+  registeredAt  DateTime  @default(now())
+  donatedAt     DateTime?
+  offlineSyncId String    @unique
 
-  donor        Donor    @relation(fields: [donorId], references: [id])
-  campaign     Campaign @relation(fields: [campaignId], references: [id])
+  donor    Donor    @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   @@unique([donorId, campaignId])
 }
