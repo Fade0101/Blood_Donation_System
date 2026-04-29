@@ -41,14 +41,15 @@ export const campaignController = {
       campaignId as string,
       bloodType as string | undefined
     );
-
+    const buffer = Buffer.concat([
+      Buffer.from('\uFEFF', 'utf-8'),
+      Buffer.from(csvData, 'utf-8')
+    ]);
+    const bom = '\uFEFF';
     const campaign = await campaignService.getCampaignById(campaignId as string);
 
-    res.setHeader("Content-Type", "text/csv; charset=utf-8");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=campaign_${campaign.campaignNumber}_donors.csv`
-    );
-    res.status(200).send(csvData);
+   res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename=campaign_${campaign.campaignNumber}_donors.csv`);
+  res.status(200).send(buffer);
   },
 };

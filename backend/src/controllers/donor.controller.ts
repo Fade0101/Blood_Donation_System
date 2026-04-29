@@ -26,4 +26,10 @@ export const donorController = {
     await donorService.deleteDonor(req.params.id as string);
     res.status(204).send();
   },
+
+  async search(req: Request, res: Response) {
+    const query = req.query.q as string;
+    const donors = await donorService.searchDonors(query);
+    res.json({ success: true, data: donors });
+  },
 };

@@ -19,11 +19,14 @@ export const errorHandler = (
   _next: NextFunction
 ) => {
   if (err instanceof AppError) {
-    const response: Record<string, any> = { error: err.message };
-    if (err.details) {
-      response.details = err.details;
-    }
-    res.status(err.statusCode).json(response);
+    res.status(err.statusCode).json({
+      success: false,
+      message: err.message,
+      error: {
+        code: err.statusCode === 404 ? "NOT_FOUND" : "VALIDATION_ERROR",
+        details: err.details || null
+      }
+    });
     return;
   }
 
@@ -37,12 +40,36 @@ export const errorHandler = (
       {} as Record<string, string>
     );
     res.status(400).json({
-      error: "Validation failed",
-      details: fieldErrors,
+      success: false,
+      message: "خطأ في التحقق من البيانات",
+      error: {
+        code: "VALIDATION_ERROR",
+        details: fieldErrors
+      }
+    });
+    return;
+  }
+
+  // Handle JSON parse errors
+  if (err instanceof SyntaxError && 'body' in err) {
+    res.status(400).json({
+      success: false,
+      message: "صيغة JSON غير صحيحة",
+      error: {
+        code: "INVALID_JSON",
+        details: null
+      }
     });
     return;
   }
 
   console.error(err);
-  res.status(500).json({ error: "Internal server error" });
+  res.status(500).json({
+    success: false,
+    message: "خطأ في السيرفر",
+    error: {
+      code: "INTERNAL_SERVER_ERROR",
+      details: null
+    }
+  });
 };
