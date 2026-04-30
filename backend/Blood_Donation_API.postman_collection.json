@@ -1,0 +1,488 @@
+{
+  "info": {
+    "name": "Blood Donation Campaign API",
+    "description": "Complete API documentation for Blood Donation Campaign Platform - Backend System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Donors",
+      "description": "Donor management endpoints",
+      "item": [
+        {
+          "name": "Get All Donors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/donors",
+              "host": ["{{base_url}}"],
+              "path": ["donors"]
+            },
+            "description": "Retrieve all donors from the system"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Donors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/donors/search?q=Ahmed",
+              "host": ["{{base_url}}"],
+              "path": ["donors", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Ahmed",
+                  "description": "Search query (name, phone, or national ID)"
+                }
+              ]
+            },
+            "description": "Search donors by name, phone, or national ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Donor by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/donors/{{donor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["donors", "{{donor_id}}"]
+            },
+            "description": "Retrieve a specific donor by UUID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Donor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+201001234567\",\n  \"address\": \"Cairo, Egypt\",\n  \"dateOfBirth\": \"1990-01-15T00:00:00Z\",\n  \"bloodType\": \"O_POS\",\n  \"gender\": \"MALE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/donors",
+              "host": ["{{base_url}}"],
+              "path": ["donors"]
+            },
+            "description": "Create a new donor record. Required: nationalId (14 chars), name, phone. Optional: address, dateOfBirth, bloodType, gender"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Donor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ahmed Hassan Updated\",\n  \"phone\": \"+201001234568\",\n  \"address\": \"Alexandria, Egypt\",\n  \"bloodType\": \"A_POS\",\n  \"gender\": \"MALE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/donors/{{donor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["donors", "{{donor_id}}"]
+            },
+            "description": "Update an existing donor record. All fields are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Donor",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/donors/{{donor_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["donors", "{{donor_id}}"]
+            },
+            "description": "Delete a donor record. Returns 204 No Content on success."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Campaigns",
+      "description": "Campaign management endpoints",
+      "item": [
+        {
+          "name": "Get All Campaigns",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns"]
+            },
+            "description": "Retrieve all blood donation campaigns"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Campaign by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}"]
+            },
+            "description": "Retrieve a specific campaign by UUID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campaignNumber\": 1,\n  \"startDate\": \"2026-04-29T08:00:00Z\",\n  \"endDate\": \"2026-05-29T18:00:00Z\",\n  \"bloodBankName\": \"Red Crescent Blood Bank\",\n  \"supervisorName\": \"Dr. Fatima Ahmed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns"]
+            },
+            "description": "Create a new blood donation campaign. Required: campaignNumber (positive integer), startDate (ISO 8601). Optional: endDate, bloodBankName, supervisorName"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Campaign",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"endDate\": \"2026-06-29T18:00:00Z\",\n  \"bloodBankName\": \"Updated Blood Bank\",\n  \"supervisorName\": \"Dr. Mohammed Ali\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}"]
+            },
+            "description": "Update an existing campaign. All fields are optional."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Campaign",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}"]
+            },
+            "description": "Delete a campaign. Returns 204 No Content on success."
+          },
+          "response": []
+        },
+        {
+          "name": "Register Donor to Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nationalId\": \"12345678901234\",\n  \"name\": \"Ahmed Hassan\",\n  \"phone\": \"+201001234567\",\n  \"address\": \"Cairo, Egypt\",\n  \"dateOfBirth\": \"1990-01-15T00:00:00Z\",\n  \"bloodType\": \"O_POS\",\n  \"gender\": \"MALE\",\n  \"offlineSyncId\": \"550e8400-e29b-41d4-a716-446655440000\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "register"]
+            },
+            "description": "Register a donor to a campaign. Smart transaction: if donor exists by nationalId, link them; if not, create new donor (requires full details). If offlineSyncId not provided, backend generates UUID."
+          },
+          "response": []
+        },
+        {
+          "name": "Export Campaign Donors as CSV",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/csv"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/campaigns/{{campaign_id}}/export?bloodType=O_POS",
+              "host": ["{{base_url}}"],
+              "path": ["campaigns", "{{campaign_id}}", "export"],
+              "query": [
+                {
+                  "key": "bloodType",
+                  "value": "O_POS",
+                  "description": "Optional: Filter by blood type (A_POS, A_NEG, B_POS, B_NEG, AB_POS, AB_NEG, O_POS, O_NEG)"
+                }
+              ]
+            },
+            "description": "Export all donors registered to a campaign as CSV file with UTF-8 BOM encoding. Optional blood type filter."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Imports",
+      "description": "Data import endpoints for CSV files",
+      "item": [
+        {
+          "name": "Import Blood Bank Data",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "CSV file with columns: nationalId, name, phone, address, bloodType, gender, campaignNumber"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/imports/blood-bank",
+              "host": ["{{base_url}}"],
+              "path": ["imports", "blood-bank"]
+            },
+            "description": "Import blood bank donor data from CSV file. Used for active campaign donor registration and blood type updates. Max file size: 10MB. CSV columns: nationalId, name, phone, address, bloodType, gender, campaignNumber"
+          },
+          "response": []
+        },
+        {
+          "name": "Import Legacy System Data",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "CSV file with legacy donor data (supports Arabic column names)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/imports/legacy",
+              "host": ["{{base_url}}"],
+              "path": ["imports", "legacy"]
+            },
+            "description": "Import donor data from legacy system for migration. Max file size: 10MB. Generates LEGACY- prefixed national IDs for donors without existing IDs. Supports Arabic column names."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sync",
+      "description": "Offline data synchronization",
+      "item": [
+        {
+          "name": "Sync Offline Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campaignId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"donors\": [\n    {\n      \"nationalId\": \"12345678901234\",\n      \"name\": \"Ahmed Hassan\",\n      \"phone\": \"+201001234567\",\n      \"address\": \"Cairo, Egypt\",\n      \"dateOfBirth\": \"1990-01-15T00:00:00Z\",\n      \"bloodType\": \"O_POS\",\n      \"gender\": \"MALE\",\n      \"offlineSyncId\": \"550e8400-e29b-41d4-a716-446655440001\"\n    },\n    {\n      \"nationalId\": \"98765432109876\",\n      \"name\": \"Fatima Ali\",\n      \"phone\": \"+201001234568\",\n      \"address\": \"Alexandria, Egypt\",\n      \"dateOfBirth\": \"1992-05-20T00:00:00Z\",\n      \"bloodType\": \"A_POS\",\n      \"gender\": \"FEMALE\",\n      \"offlineSyncId\": \"550e8400-e29b-41d4-a716-446655440002\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/sync",
+              "host": ["{{base_url}}"],
+              "path": ["sync"]
+            },
+            "description": "Sync offline collected donor data to the server. Required: campaignId (UUID), donors array. Each donor requires: nationalId, name, phone. Optional: address, dateOfBirth, bloodType, gender, offlineSyncId (auto-generated if not provided). Returns status for each donor: success, duplicate_sync, already_registered, or error."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api",
+      "type": "string",
+      "description": "Base URL for the API"
+    },
+    {
+      "key": "donor_id",
+      "value": "",
+      "type": "string",
+      "description": "UUID of a donor"
+    },
+    {
+      "key": "campaign_id",
+      "value": "",
+      "type": "string",
+      "description": "UUID of a campaign"
+    },
+    {
+      "key": "national_id",
+      "value": "12345678901234",
+      "type": "string",
+      "description": "National ID (14 characters)"
+    },
+    {
+      "key": "donor_name",
+      "value": "Ahmed Hassan",
+      "type": "string",
+      "description": "Donor full name"
+    },
+    {
+      "key": "donor_phone",
+      "value": "+201001234567",
+      "type": "string",
+      "description": "Donor phone number"
+    },
+    {
+      "key": "donor_address",
+      "value": "Cairo, Egypt",
+      "type": "string",
+      "description": "Donor address"
+    },
+    {
+      "key": "date_of_birth",
+      "value": "1990-01-15T00:00:00Z",
+      "type": "string",
+      "description": "Date of birth in ISO 8601 format"
+    },
+    {
+      "key": "blood_type",
+      "value": "O_POS",
+      "type": "string",
+      "description": "Blood type: A_POS, A_NEG, B_POS, B_NEG, AB_POS, AB_NEG, O_POS, O_NEG"
+    },
+    {
+      "key": "gender",
+      "value": "MALE",
+      "type": "string",
+      "description": "Gender: MALE or FEMALE"
+    },
+    {
+      "key": "campaign_number",
+      "value": "1",
+      "type": "number",
+      "description": "Campaign number (positive integer)"
+    },
+    {
+      "key": "campaign_start_date",
+      "value": "2026-04-29T08:00:00Z",
+      "type": "string",
+      "description": "Campaign start date in ISO 8601 format"
+    },
+    {
+      "key": "campaign_end_date",
+      "value": "2026-05-29T18:00:00Z",
+      "type": "string",
+      "description": "Campaign end date in ISO 8601 format"
+    },
+    {
+      "key": "blood_bank_name",
+      "value": "Red Crescent Blood Bank",
+      "type": "string",
+      "description": "Blood bank name"
+    },
+    {
+      "key": "supervisor_name",
+      "value": "Dr. Fatima Ahmed",
+      "type": "string",
+      "description": "Campaign supervisor name"
+    },
+    {
+      "key": "search_query",
+      "value": "Ahmed",
+      "type": "string",
+      "description": "Search query for donor search"
+    },
+    {
+      "key": "blood_type_filter",
+      "value": "O_POS",
+      "type": "string",
+      "description": "Blood type filter for CSV export"
+    },
+    {
+      "key": "offline_sync_id",
+      "value": "550e8400-e29b-41d4-a716-446655440000",
+      "type": "string",
+      "description": "Unique ID for offline sync operations (UUID format)"
+    }
+  ]
+}

@@ -47,4 +47,13 @@ export const donorService = {
     await donorService.getDonorById(id);
     await donorRepository.delete(id);
   },
+
+  async searchDonors(query: string): Promise<DonorWithAge[]> {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) {
+      throw new AppError(400, "Search query cannot be empty");
+    }
+    const donors = await donorRepository.search(trimmedQuery);
+    return donors.map(withAge);
+  },
 };

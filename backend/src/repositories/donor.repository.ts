@@ -36,4 +36,38 @@ export const donorRepository = {
   delete(id: string) {
     return prisma.donor.delete({ where: { id } });
   },
+
+  search(query: string) {
+    return prisma.donor.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: "insensitive" } },
+          { phone: { contains: query, mode: "insensitive" } },
+        ],
+      },
+      take: 10,
+      orderBy: { createdAt: "desc" },
+    });
+  },
+
+  upsert(nationalId: string, data: any) {
+    return prisma.donor.upsert({
+      where: { nationalId },
+      update: {
+        name: data.name,
+        phone: data.phone,
+        address: data.address,
+        bloodType: data.bloodType,
+        gender: data.gender,
+      },
+      create: {
+        nationalId,
+        name: data.name,
+        phone: data.phone,
+        address: data.address,
+        bloodType: data.bloodType,
+        gender: data.gender,
+      },
+    });
+  },
 };

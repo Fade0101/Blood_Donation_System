@@ -11,6 +11,7 @@ import {
 const router = Router();
 
 router.get("/", asyncHandler(donorController.getAll));
+router.get("/search", asyncHandler(donorController.search));
 router.get(
   "/:id",
   validateRequest(donorIdParamSchema, "params"),

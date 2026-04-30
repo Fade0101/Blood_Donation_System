@@ -12,6 +12,8 @@ export const bloodTypeEnum = z.enum([
   "O_NEG",
 ]);
 
+export const genderEnum = z.enum(["MALE", "FEMALE"]);
+
 export const createDonorSchema = z.object({
   nationalId: z.string().min(1, "National ID is required").length(14, "National ID must be exactly 14 characters"),
   name: z.string().min(1, "Name is required"),
@@ -19,6 +21,7 @@ export const createDonorSchema = z.object({
   address: z.string().optional(),
   dateOfBirth: z.string().datetime().optional(),
   bloodType: bloodTypeEnum.optional(),
+  gender: genderEnum.optional(),
 });
 
 export const updateDonorSchema = z.object({
@@ -27,6 +30,7 @@ export const updateDonorSchema = z.object({
   address: z.string().optional(),
   dateOfBirth: z.string().datetime().optional(),
   bloodType: bloodTypeEnum.optional(),
+  gender: genderEnum.optional(),
 });
 
 export const donorIdParamSchema = z.object({
