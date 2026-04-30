@@ -24,13 +24,13 @@ export const routes: Routes = [
     path: 'campaigns',
     loadComponent: () =>
       import('./components/campaign/campaign')
-        .then(m => m.Campaign)
+        .then(m => m.CampaignComponent)
   },
     {
-    path: 'campaignDetails',
+  path: 'campaign-details/:id',
     loadComponent: () =>
       import('./components/campaign-details/campaign-details')
-        .then(m => m.CampaignDetails)
+        .then(m => m.CampaignDetailsComponent)
   },
   {
     path: 'dashboard',

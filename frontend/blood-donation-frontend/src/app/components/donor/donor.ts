@@ -117,14 +117,18 @@ export class Donor implements OnInit {
 
   deleteDonor(id: string) {
     Swal.fire({
-      title: 'هل أنت متأكد؟',
-      text: 'لن يمكنك التراجع بعد الحذف!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'نعم احذف',
-      cancelButtonText: 'إلغاء'
+     title: 'هل تريد حذف المتبرع؟',
+  text: 'لا يمكن التراجع بعد الحذف',
+  imageUrl: '/HabashyBblood.jpg',
+  imageWidth: 120,
+  imageHeight: 120,
+  imageAlt: 'Habashy Blood',
+  showCancelButton: true,
+  confirmButtonColor: '#dc2626',
+  cancelButtonColor: '#9ca3af',
+  confirmButtonText: 'حذف',
+  cancelButtonText: 'إلغاء',
+  background: '#fff',
     }).then(result => {
       if (!result.isConfirmed) return;
 
