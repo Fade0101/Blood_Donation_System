@@ -32,11 +32,7 @@ private apiUrl = `${environment.baseurl}/api/campaigns`;
       responseType: 'blob',
     });
   }
-  getCampaignDonors(campaignId: string) {
-  return this.http.get<any[]>(
-    `${this.apiUrl}/${campaignId}/donors`
-  );
-}
+
 getCampaignStats(campaignId: string) {
   return this.http.get<any>(
     `${this.apiUrl}/${campaignId}/stats`
@@ -48,11 +44,7 @@ markAsDonated(campaignId: string, donorId: string) {
     {}
   );
 }
-removeDonor(campaignId: string, donorId: string) {
-  return this.http.delete(
-    `${this.apiUrl}/${campaignId}/donors/${donorId}`
-  );
-}
+
 // ================= SEARCH DONORS =================
 searchDonors(query: string): Observable<any[]> {
   return this.http.get<any[]>(
@@ -60,6 +52,17 @@ searchDonors(query: string): Observable<any[]> {
     {
       params: { q: query }
     }
+  );
+}
+
+getCampaignDonors(campaignId: string) {
+  return this.http.get<any[]>(
+    `${this.apiUrl}/${campaignId}/donors`
+  );
+}
+removeDonor(campaignId: string, donorId: string) {
+  return this.http.delete(
+    `${this.apiUrl}/${campaignId}/donors/${donorId}`
   );
 }
 }
