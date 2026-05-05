@@ -34,9 +34,11 @@ private baseUrl = `${environment.baseurl}/api/campaigns`;  // ================= 
   }
 
   // ================= DELETE =================
-  deleteCampaign(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
-  }
+deleteCampaign(id: string) {
+  return this.http.delete(`${this.baseUrl}/${id}`, {
+    responseType: 'text' as 'json' // 🔥 مهم جدًا مع 204
+  });
+}
   getAllDonors() {
   return this.http.get<any[]>(`${environment.baseurl}/api/donors`);
 }
