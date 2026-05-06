@@ -16,7 +16,7 @@ CLAUDE.md
 *.swp
 *.swo
 *~
-
+*cluade*
 # Build output
 dist/
 *.csv

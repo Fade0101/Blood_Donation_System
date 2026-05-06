@@ -1,29 +1,19 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideToastr } from 'ngx-toastr';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from "@angular/core";
+import { provideRouter } from "@angular/router";
+import { provideToastr } from "ngx-toastr";
 
-import { routes } from './app.routes';
-import { errorInterceptor } from './core/interceptors/error.interceptor';
-
-// 🔥 Chart.js setup
-import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
+import { routes } from "./app.routes";
+import { provideClientHydration, withEventReplay } from "@angular/platform-browser";
+import { provideHttpClient, withFetch, withInterceptors } from "@angular/common/http";
+import { errorInterceptor } from "./core/interceptors/error.interceptor";
+import { authInterceptor } from "./core/interceptors/auth.interceptor";
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    // ✅ HttpClient مرة واحدة بس
-    provideHttpClient(
-      withFetch(),
-      withInterceptors([errorInterceptor])
-    ),
-
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor, errorInterceptor])),
     provideRouter(routes),
-
     provideClientHydration(withEventReplay()),
-
     provideToastr({
       timeOut: 2500,
       extendedTimeOut: 1000,

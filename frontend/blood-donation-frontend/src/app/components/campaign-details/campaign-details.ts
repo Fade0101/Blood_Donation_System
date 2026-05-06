@@ -1,11 +1,13 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 import { CampaignService } from '../../services/campaignService';
 import { CampaignOperationsService } from '../../services/campaign-operations';
+import { link } from 'fs';
 
 @Component({
   selector: 'app-campaign-details',
@@ -63,37 +65,40 @@ export class CampaignDetailsComponent implements OnInit {
   // ================= LOAD =================
   loadData() {
     this.loading.set(true);
-
     this.loadCampaign();
     this.loadAllDonors();
     this.loadCampaignDonors();
   }
 
-loadCampaign() {
-  this.campaignService.getCampaignById(this.campaignId)
-    .subscribe((res: any) => {
-      this.campaign.set(res);
-    });
-}
-loadAllDonors() {
-  this.campaignService.getAllDonors()
-    .subscribe((res: any) => {
-      this.allDonors.set(res.data ?? []);
-    });
-}
+  loadCampaign() {
+    this.campaignService.getCampaignById(this.campaignId)
+      .subscribe((res: any) => {
+        this.campaign.set(res.data || res);
+      });
+  }
 
- loadCampaignDonors() {
-  this.opsService.getCampaignDonors(this.campaignId)
-    .subscribe({
-      next: (res: any) => {
-        this.campaignDonors.set(res.data ?? []);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.campaignDonors.set([]);
-        this.loading.set(false);
-      }
-    })}
+  loadAllDonors() {
+    this.campaignService.getAllDonors(10000)
+      .subscribe((res: any) => {
+        const data = res.data || res;
+        this.allDonors.set(Array.isArray(data) ? data : []);
+      });
+  }
+
+  loadCampaignDonors() {
+    this.opsService.getCampaignDonors(this.campaignId)
+      .subscribe({
+        next: (res: any) => {
+          const data = res.data || res;
+          this.campaignDonors.set(Array.isArray(data) ? data : []);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.campaignDonors.set([]);
+          this.loading.set(false);
+        }
+      });
+  }
 
   // ================= ACTIONS =================
   selectDonor(donor: any) {
@@ -125,9 +130,13 @@ loadAllDonors() {
 
   exportCSV() {
     this.opsService.exportCampaignDonors(this.campaignId)
-      .subscribe((res) => {
+      .subscribe((response: HttpResponse<Blob>) => {
+        const blob = response.body;
+        if (!blob) {
+          this.toastr.error('تعذر تصدير الملف حالياً');
+          return;
+        }
 
-        const blob = res.body!;
         const url = window.URL.createObjectURL(blob);
 
         const a = document.createElement('a');

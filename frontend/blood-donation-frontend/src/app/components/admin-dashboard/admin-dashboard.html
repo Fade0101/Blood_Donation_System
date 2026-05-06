@@ -1,0 +1,113 @@
+<div dir="rtl" class="min-h-screen bg-slate-50 py-24 px-4 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-6xl">
+
+    <div class="mb-8 text-right">
+      <h1 class="text-2xl font-bold text-gray-900">لوحة التحكم</h1>
+      <p class="mt-1 text-sm text-gray-500 font-medium">إدارة طلبات المستخدمين والأدوار والصلاحيات</p>
+    </div>
+
+    <div class="mb-6 flex gap-2 border-b border-gray-200">
+      <button
+        (click)="activeTab.set('pending')"
+        [ngClass]="{
+          'px-4 py-2 text-sm font-bold border-b-2 transition-all duration-200': true,
+          'border-red-700 text-red-700': activeTab() === 'pending',
+          'border-transparent text-gray-500 hover:text-gray-700': activeTab() !== 'pending'
+        }"
+      >
+        <i class="fa-solid fa-hourglass-end ml-2 text-xs"></i>
+        الطلبات المعلقة ({{ pendingUsers().length }})
+      </button>
+      <button
+        (click)="activeTab.set('approved')"
+        [ngClass]="{
+          'px-4 py-2 text-sm font-bold border-b-2 transition-all duration-200': true,
+          'border-red-700 text-red-700': activeTab() === 'approved',
+          'border-transparent text-gray-500 hover:text-gray-700': activeTab() !== 'approved'
+        }"
+      >
+        <i class="fa-solid fa-check-circle ml-2 text-xs"></i>
+        المستخدمون المعتمدون ({{ approvedUsers().length }})
+      </button>
+    </div>
+
+    <div class="rounded-xl bg-white shadow-sm border border-gray-100 overflow-hidden">
+
+      <div *ngIf="isLoading()" class="flex justify-center items-center py-16">
+        <div class="text-center">
+          <img src="/dam.gif" alt="Loading" class="mx-auto h-12 w-12 rounded-full mb-3" />
+          <p class="text-sm text-gray-400">جاري تحميل البيانات...</p>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading() && (activeTab() === 'pending' ? pendingUsers().length === 0 : approvedUsers().length === 0)" class="px-6 py-16 text-center">
+        <i class="fa-solid fa-inbox text-4xl text-gray-200 mb-4 block"></i>
+        <p class="text-sm text-gray-400">لا توجد بيانات لعرضها حالياً</p>
+      </div>
+
+      <div *ngIf="!isLoading() && (activeTab() === 'pending' ? pendingUsers().length > 0 : approvedUsers().length > 0)" class="overflow-x-auto">
+        <table class="w-full text-right">
+          <thead class="bg-gray-50/50 border-b border-gray-100">
+            <tr>
+              <th class="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">البريد الإلكتروني</th>
+              <th *ngIf="activeTab() === 'approved'" class="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">الدور</th>
+              <th class="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">تاريخ التسجيل</th>
+              <th class="px-6 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">الإجراءات</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-50">
+            <tr *ngFor="let user of (activeTab() === 'pending' ? pendingUsers() : approvedUsers())" class="hover:bg-gray-50/50 transition-colors">
+              <td class="px-6 py-3.5 text-sm font-medium text-gray-900">
+                {{ user.email }}
+              </td>
+
+              <td *ngIf="activeTab() === 'approved'" class="px-6 py-3.5">
+                <span
+                  [ngClass]="{
+                    'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase': true,
+                    'bg-blue-50 text-blue-700 border border-blue-100': user.role === 'ADMIN',
+                    'bg-slate-50 text-slate-600 border border-slate-200': user.role === 'STAFF'
+                  }"
+                >
+                  <i class="text-[9px]" [ngClass]="user.role === 'ADMIN' ? 'fa-solid fa-shield' : 'fa-solid fa-user'"></i>
+                  {{ user.role === 'ADMIN' ? 'مسؤول' : 'موظف' }}
+                </span>
+              </td>
+
+              <td class="px-6 py-3.5 text-xs text-gray-500">
+                {{ user.createdAt | date: 'dd/MM/yyyy, h:mm a' }}
+              </td>
+
+              <td class="px-6 py-3.5 flex justify-center gap-2">
+                <ng-container *ngIf="activeTab() === 'pending'">
+                  <button (click)="approveUser(user.id)" class="px-3 py-1.5 text-xs font-bold bg-green-50 text-green-700 rounded-lg hover:bg-green-600 hover:text-white transition-all">
+                    <i class="fa-solid fa-check ml-1"></i> موافقة
+                  </button>
+                  <button (click)="rejectUser(user.id)" class="px-3 py-1.5 text-xs font-bold bg-red-50 text-red-700 rounded-lg hover:bg-red-600 hover:text-white transition-all">
+                    <i class="fa-solid fa-xmark ml-1"></i> رفض
+                  </button>
+                </ng-container>
+
+                <ng-container *ngIf="activeTab() === 'approved'">
+                  <button
+                    *ngIf="user.role === 'STAFF'"
+                    (click)="makeAdmin(user.id)"
+                    class="px-3 py-1.5 text-xs font-bold bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-700 hover:text-white transition-all">
+                    <i class="fa-solid fa-arrow-up ml-1"></i> ترقية لآدمن
+                  </button>
+                  <button
+                    *ngIf="user.role === 'ADMIN' && user.email !== 'admin@blooddonation.com'"
+                    (click)="makeStaff(user.id)"
+                    class="px-3 py-1.5 text-xs font-bold bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-700 hover:text-white transition-all">
+                    <i class="fa-solid fa-arrow-down ml-1"></i> تخفيض لموظف
+                  </button>
+                </ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
