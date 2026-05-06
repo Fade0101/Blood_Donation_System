@@ -29,7 +29,7 @@ yarn-error.log
 !.vscode/mcp.json
 .history/*
 *.md
-
+*.cluade
 # Miscellaneous
 /.angular/cache
 .sass-cache/
