@@ -1,0 +1,173 @@
+<div class="min-h-screen bg-gray-50 pt-28 pb-12" dir="rtl">
+  <div class="max-w-7xl mx-auto px-6 space-y-8">
+
+    <!-- Campaign Info -->
+    <div class="bg-white rounded-3xl shadow-xl p-6 border border-red-100">
+      <div class="flex justify-between items-start">
+
+        <div>
+          <h1 class="text-2xl font-bold text-red-700">
+            حملة رقم #{{ campaign()?.campaignNumber }}
+          </h1>
+
+          <div class="mt-3 text-gray-600 space-y-1">
+            <p>🏥 {{ campaign()?.bloodBankName }}</p>
+            <p>👨‍⚕️ {{ campaign()?.supervisorName }}</p>
+            <p>📅 {{ campaign()?.startDate | date }} - {{ campaign()?.endDate | date }}</p>
+          </div>
+        </div>
+
+        <button
+          (click)="exportCSV()"
+          class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl shadow"
+        >
+          Export CSV
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Campaign Donors -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-3xl shadow-2xl border border-red-100 overflow-hidden">
+
+          <!-- Header -->
+          <div class="bg-gradient-to-r from-red-700 to-red-500 p-8 text-white">
+            <div class="flex justify-between items-center">
+
+              <div>
+                <h2 class="text-3xl font-bold">المتبرعين داخل الحملة</h2>
+                <p class="text-red-100 mt-2">قائمة المتبرعين المسجلين</p>
+              </div>
+
+              <div class="bg-white/20 px-5 py-3 rounded-2xl">
+                {{ campaignDonors().length }} Donors
+              </div>
+
+            </div>
+          </div>
+
+          <!-- List -->
+          <div class="p-6 space-y-5 max-h-[800px] overflow-y-auto bg-gray-50">
+
+            @if (campaignDonors().length === 0) {
+              <div class="text-center py-24">
+                <img src="HabashyBblood.jpg" class="w-48 mx-auto mb-4 opacity-90 rounded-2xl shadow" />
+                <p class="text-gray-500 mt-3">لا يوجد متبرعين داخل الحملة</p>
+              </div>
+            }
+
+            @for (d of campaignDonors(); track d.id) {
+              <div class="bg-white rounded-3xl p-6 border hover:shadow-xl transition">
+
+                <div class="flex gap-4 items-center">
+
+                  <img
+                    [src]="d.imageUrl || 'HabashyBblood.jpg'"
+                    class="w-14 h-14 rounded-2xl object-cover border shadow"
+                  />
+
+                  <div class="flex-1">
+
+                    <div class="flex items-center gap-3">
+                      <p class="font-bold text-lg">{{ d.name }}</p>
+
+                      <span
+                        *ngIf="isInCampaign(d.id)"
+                        class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full"
+                      >
+                        داخل الحملة
+                      </span>
+                    </div>
+
+                    <div class="text-sm text-gray-500 grid grid-cols-2 mt-2 gap-x-4">
+                      <p>📞 {{ d.phone }}</p>
+                      <p>🪪 {{ d.nationalId }}</p>
+                      <p>🩸 {{ d.bloodType || 'N/A' }}</p>
+                      <p>📍 {{ d.address || 'N/A' }}</p>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            }
+
+          </div>
+        </div>
+      </div>
+
+      <!-- All Donors -->
+      <div>
+        <div class="bg-white rounded-3xl shadow-2xl border overflow-hidden sticky top-28">
+
+          <!-- Header -->
+          <div class="bg-gradient-to-r from-red-600 to-red-500 p-6 text-white">
+            <h2 class="text-2xl font-bold">كل المتبرعين</h2>
+            <p class="text-red-100 text-sm mt-1">ابحث واختر للإضافة</p>
+          </div>
+
+          <!-- Search -->
+          <div class="p-4 border-b bg-gray-50">
+            <input
+              type="text"
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
+              placeholder="ابحث..."
+              class="w-full px-4 py-3 rounded-2xl border"
+            />
+          </div>
+
+          <!-- List -->
+          <div class="p-4 space-y-4 max-h-[750px] overflow-y-auto">
+
+            @if (filteredDonors().length === 0) {
+              <div class="text-center py-16">
+                <img src="HabashyBblood.jpg" class="w-32 mx-auto mb-4 opacity-90 rounded-xl" />
+                <p class="text-gray-400">لا يوجد متبرعين</p>
+              </div>
+            }
+
+            @for (d of filteredDonors(); track d.id) {
+              <div class="border rounded-2xl p-4 hover:shadow-lg transition">
+
+                <div class="flex gap-3 items-center mb-3">
+
+                  <img
+                    [src]="d.imageUrl || 'HabashyBblood.jpg'"
+                    class="w-12 h-12 rounded-xl object-cover border shadow"
+                  />
+
+                  <div>
+                    <p class="font-semibold">{{ d.name }}</p>
+                    <p class="text-xs text-gray-500">{{ d.nationalId }}</p>
+                  </div>
+
+                </div>
+
+                <button
+                  (click)="selectDonor(d)"
+                  [disabled]="isInCampaign(d.id)"
+                  class="w-full py-2 rounded-xl transition"
+                  [ngClass]="isInCampaign(d.id)
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-red-600 hover:bg-red-700 text-white'"
+                >
+                  {{ isInCampaign(d.id) ? 'تمت الإضافة' : 'إضافة للحملة' }}
+                </button>
+
+              </div>
+            }
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
