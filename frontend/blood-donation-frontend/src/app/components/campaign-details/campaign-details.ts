@@ -1,9 +1,8 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { HttpResponse } from '@angular/common/http';
 
 import { CampaignService } from '../../services/campaignService';
 import { CampaignOperationsService } from '../../services/campaign-operations';
@@ -16,27 +15,36 @@ import { CampaignOperationsService } from '../../services/campaign-operations';
   styleUrl: './campaign-details.css',
 })
 export class CampaignDetailsComponent implements OnInit {
+
   private route = inject(ActivatedRoute);
   private campaignService = inject(CampaignService);
   private opsService = inject(CampaignOperationsService);
   private toastr = inject(ToastrService);
 
+  // ================= STATE =================
   loading = signal(false);
+
   campaign = signal<any>(null);
-
-
   allDonors = signal<any[]>([]);
   campaignDonors = signal<any[]>([]);
   searchTerm = signal('');
 
   campaignId!: string;
 
+  // ================= DERIVED =================
+  campaignDonorIds = computed(() => {
+    return new Set(
+      this.campaignDonors().map(d => d.donorId || d.id || d._id)
+    );
+  });
+
+  isInCampaign = (id: string) => {
+    return this.campaignDonorIds().has(id);
+  };
 
   filteredDonors = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    const donors = this.allDonors();
-
-    if (!Array.isArray(donors)) return [];
+    const donors = this.allDonors() || [];
 
     return donors.filter(d =>
       d.name?.toLowerCase().includes(term) ||
@@ -48,42 +56,18 @@ export class CampaignDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.campaignId = params['id'];
-      if (this.campaignId) {
-        this.loadInitialData();
-      }
+      this.loadData();
     });
   }
 
-loadInitialData() {
+  // ================= LOAD =================
+  loadData() {
     this.loading.set(true);
-    this.loadCampaign(); // جلب بيانات الحملة (الاسم، التاريخ، إلخ)
-
-    // 1. جلب "كل المتبرعين" المسجلين في السيستم (للقائمة اليسرى)
-    this.campaignService.getAllDonors().subscribe({
-      next: (res: any) => {
-        const data = res.data || res;
-        this.allDonors.set(Array.isArray(data) ? data : []);
-
-        // 2. استخدام الـ API الخاص بالحملة (للقائمة اليمنى - المتبرعين المشاركين)
-        this.opsService.getCampaignDonors(this.campaignId).subscribe({
-          next: (campRes: any) => {
-            // هنا بنستخدم الـ API اللي بيجيب المتبرعين بتوع الحملة دي بس
-            const campData = campRes.data || campRes;
-            this.campaignDonors.set(Array.isArray(campData) ? campData : []);
-            this.loading.set(false);
-          },
-          error: () => {
-            this.campaignDonors.set([]);
-            this.loading.set(false);
-          }
-        });
-      },
-      error: () => {
-        this.allDonors.set([]);
-        this.loading.set(false);
-      }
-    });
+    this.loadCampaign();
+    this.loadAllDonors();
+    this.loadCampaignDonors();
   }
+
   loadCampaign() {
     this.campaignService.getCampaignById(this.campaignId)
       .subscribe((res: any) => {
@@ -91,15 +75,34 @@ loadInitialData() {
       });
   }
 
-  isInCampaign(donorId: string): boolean {
-    const donors = this.campaignDonors();
-
-    return donors.some(d => (d.donorId === donorId || d.id === donorId));
+  loadAllDonors() {
+    this.campaignService.getAllDonors()
+      .subscribe((res: any) => {
+        const data = res.data || res;
+        this.allDonors.set(Array.isArray(data) ? data : []);
+      });
   }
 
+  loadCampaignDonors() {
+    this.opsService.getCampaignDonors(this.campaignId)
+      .subscribe({
+        next: (res: any) => {
+          const data = res.data || res;
+          this.campaignDonors.set(Array.isArray(data) ? data : []);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.campaignDonors.set([]);
+          this.loading.set(false);
+        }
+      });
+  }
+
+  // ================= ACTIONS =================
   selectDonor(donor: any) {
+
     if (this.isInCampaign(donor.id)) {
-      this.toastr.warning('المتبرع موجود بالفعل في هذه الحملة');
+      this.toastr.warning('المتبرع موجود بالفعل');
       return;
     }
 
@@ -108,42 +111,32 @@ loadInitialData() {
       name: donor.name,
       phone: donor.phone,
       address: donor.address || '',
-      dateOfBirth: donor.dateOfBirth ? new Date(donor.dateOfBirth).toISOString() : undefined,
+      dateOfBirth: donor.dateOfBirth
+        ? new Date(donor.dateOfBirth).toISOString()
+        : undefined,
       offlineSyncId: crypto.randomUUID()
     };
 
     this.opsService.registerDonorToCampaign(this.campaignId, payload)
       .subscribe({
         next: () => {
-          this.loadInitialData();
-          this.toastr.success('تمت إضافة المتبرع للحملة بنجاح');
+          this.toastr.success('تمت الإضافة بنجاح');
+          this.loadCampaignDonors();
         }
-
       });
   }
 
   exportCSV() {
-  this.opsService.exportCampaignDonors(this.campaignId)
-    .subscribe({
-      next: (response) => {
-        const blobData = response.body as Blob;
-        if (!blobData) return;
+    this.opsService.exportCampaignDonors(this.campaignId)
+      .subscribe((blob) => {
+        const url = window.URL.createObjectURL(blob);
 
-        const contentDisposition = response.headers.get('content-disposition');
-
-
-        const campNumber = this.campaign()?.campaignNumber || this.campaignId;
-        const fileName = contentDisposition
-          ?.split('filename=')[1]
-          ?.replace(/"/g, '') || `campaign_${campNumber}_donors.csv`;
-
-        const url = window.URL.createObjectURL(blobData);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName;
+        a.download = `campaign_${this.campaign()?.campaignNumber || this.campaignId}.csv`;
         a.click();
+
         window.URL.revokeObjectURL(url);
-      }
-    });
-}
+      });
+  }
 }

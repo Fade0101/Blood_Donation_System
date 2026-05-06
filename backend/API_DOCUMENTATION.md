@@ -349,7 +349,7 @@ Content-Type: application/json
 ### 5. Delete Campaign
 **Request:**
 ```
-DELETE /api/campaigns/:id
+DELETE /api/campaigns/:idgit log --oneline
 ```
 
 **Response (204 No Content):**

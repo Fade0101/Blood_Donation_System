@@ -27,6 +27,21 @@
             <i class="fa-solid fa-plus"></i>
             حملة جديدة
           </button>
+          <button 
+  class="hover:bg-white/10 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2"
+  (click)="fileInput.click()"
+>
+  <i class="fa-solid fa-file-import text-slate-400"></i>
+  استيراد CSV
+</button>
+
+<input
+  type="file"
+  #fileInput
+  hidden
+  accept=".csv"
+  (change)="onFileSelected($event)"
+/>
           <button class="hover:bg-white/10 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2">
             <i class="fa-solid fa-file-export text-slate-400"></i>
             تصدير تقرير

@@ -1,161 +1,64 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-pink-50 pt-28 px-6" dir="rtl">
-
   <div class="max-w-7xl mx-auto space-y-8">
 
-    <!-- ================= HEADER ================= -->
-  <div class="bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-3xl shadow-xl p-8 flex items-center justify-between">
-
-  <div>
-    <h1 class="text-3xl font-bold">
-      🩸 لوحة التحكم - بنك الدم
-    </h1>
-
-    <p class="mt-2 text-red-100">
-      نظرة عامة على المتبرعين والحملات والإحصائيات
-    </p>
-  </div>
-
-  <!-- LOGO IMAGE -->
-  <img
-    src="/HabashyBblood.jpg"
-    class="w-20 h-20 rounded-2xl shadow-lg border-2 border-white object-cover"
-  />
-
-</div>
-    <!-- ================= STATS CARDS ================= -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-      <div class="bg-white rounded-2xl shadow-lg p-6 border-r-4 border-red-500 hover:scale-105 transition">
-        <p class="text-gray-500">إجمالي المتبرعين</p>
-        <h2 class="text-3xl font-bold text-red-600">
-          {{ totalDonors() }}
-        </h2>
+    <div class="bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-3xl shadow-xl p-8 flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold">🩸 لوحة التحكم</h1>
+        <p class="text-red-100 mt-2">إحصائيات بنك الدم</p>
       </div>
-
-      <div class="bg-white rounded-2xl shadow-lg p-6 border-r-4 border-blue-500 hover:scale-105 transition">
-        <p class="text-gray-500">إجمالي الحملات</p>
-        <h2 class="text-3xl font-bold text-blue-600">
-          {{ totalCampaigns() }}
-        </h2>
-      </div>
-
-      <div class="bg-white rounded-2xl shadow-lg p-6 border-r-4 border-green-500 hover:scale-105 transition">
-        <p class="text-gray-500">المتبرعين داخل الحملات</p>
-        <h2 class="text-3xl font-bold text-green-600">
-          {{ totalCampaignDonors() }}
-        </h2>
-      </div>
-
-      <div class="bg-white rounded-2xl shadow-lg p-6 border-r-4 border-purple-500 hover:scale-105 transition">
-        <p class="text-gray-500">متبرعين جدد (7 أيام)</p>
-        <h2 class="text-3xl font-bold text-purple-600">
-          {{ newDonors() }}
-        </h2>
-      </div>
-
+      <img src="/HabashyBblood.jpg" class="w-20 h-20 rounded-2xl border-2 border-white object-cover" />
     </div>
 
-    <!-- ================= CHART STYLE SECTION ================= -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-white p-6 rounded-2xl shadow">
+        <p>إجمالي المتبرعين</p>
+        <h2 class="text-3xl text-red-600 font-bold">{{ totalDonors() }}</h2>
+      </div>
 
-      <!-- BLOOD TYPES -->
-      <div class="bg-white rounded-3xl shadow-xl p-6 border">
+      <div class="bg-white p-6 rounded-2xl shadow">
+        <p>الحملات</p>
+        <h2 class="text-3xl text-blue-600 font-bold">{{ totalCampaigns() }}</h2>
+      </div>
 
-        <h3 class="text-xl font-bold mb-4 text-red-600">
-          🩸 فصائل الدم
-        </h3>
+      <div class="bg-white p-6 rounded-2xl shadow">
+        <p>داخل الحملات</p>
+        <h2 class="text-3xl text-green-600 font-bold">{{ totalCampaignDonors() }}</h2>
+      </div>
 
-        <div class="space-y-3">
+      <div class="bg-white p-6 rounded-2xl shadow">
+        <p>جدد (3 أيام)</p>
+        <h2 class="text-3xl text-purple-600 font-bold">{{ newDonors() }}</h2>
+      </div>
+    </div>
 
-          @for (type of (bloodTypes() | keyvalue); track type.key) {
+    @if (isBrowser && donors().length > 0) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <div class="flex justify-between items-center bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-xl border">
+        <div class="bg-white p-6 rounded-2xl shadow">
+          <h3 class="font-bold mb-4">🩸 فصائل الدم</h3>
+          <canvas baseChart [type]="bloodPieChartType" [data]="bloodPieChartData"></canvas>
+        </div>
 
-              <span class="font-semibold text-gray-700">
-                {{ type.key }}
-              </span>
+        <div class="bg-white p-6 rounded-2xl shadow">
+          <h3 class="font-bold mb-4">🏆 الحملات</h3>
+          <canvas baseChart [type]="campaignBarChartType" [data]="campaignBarChartData"></canvas>
+        </div>
 
-              <span class="bg-red-600 text-white px-4 py-1 rounded-full font-bold">
-                {{ type.value }}
-              </span>
-
-            </div>
-
-          }
-
+        <div class="bg-white p-6 rounded-2xl shadow">
+          <h3 class="font-bold mb-4">📈 النمو</h3>
+          <canvas baseChart [type]="growthLineChartType" [data]="growthLineChartData"></canvas>
         </div>
 
       </div>
-
-      <!-- TOP CAMPAIGN -->
-      <div class="bg-white rounded-3xl shadow-xl p-6 border">
-
-        <h3 class="text-xl font-bold mb-4 text-blue-600">
-          🏆 أعلى حملة نشاطًا
-        </h3>
-
-        @if (topCampaign().campaign) {
-
-          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-2xl border">
-
-            <p class="text-lg font-bold text-gray-800">
-              حملة رقم #{{ topCampaign().campaign.campaignNumber }}
-            </p>
-
-            <p class="mt-2 text-gray-600">
-              عدد المتبرعين:
-              <span class="font-bold text-blue-600">
-                {{ topCampaign().count }}
-              </span>
-            </p>
-
-          </div>
-
-        }
-
+    } @else if (loading()) {
+      <div class="bg-white p-10 rounded-2xl shadow text-center text-gray-500">
+        جاري تحميل البيانات...
       </div>
-
-    </div>
-
-    <!-- ================= BOTTOM ================= -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-      <!-- AVAILABLE DONORS -->
-      <div class="bg-white rounded-3xl shadow-xl p-6 border col-span-2">
-
-        <h3 class="text-xl font-bold text-green-600 mb-3">
-          🧍 المتبرعين المتاحين
-        </h3>
-
-        <p class="text-4xl font-bold text-gray-700">
-          {{ availableDonors() }}
-        </p>
-
-        <p class="text-gray-500 mt-2">
-          لم يتم إضافتهم إلى أي حملة حتى الآن
-        </p>
-
+    } @else {
+      <div class="bg-white p-10 rounded-2xl shadow text-center text-gray-500">
+        لا توجد بيانات كافية لعرض الرسوم البيانية.
       </div>
-
-      <!-- SMALL INFO CARD -->
-     <div class="bg-white rounded-3xl shadow-xl p-6 border overflow-hidden">
-
-  <img
-    src="/HabashyBblood.jpg"
-    class="w-full h-40 object-cover rounded-2xl mb-4"
-  />
-
-  <h3 class="text-lg font-bold text-red-600">
-    ❤️ نظام بنك الدم
-  </h3>
-
-  <p class="text-gray-600 mt-2">
-    كل متبرع يمكن أن ينقذ حياة إنسان.
-  </p>
-
-</div>
-
-    </div>
+    }
 
   </div>
 </div>

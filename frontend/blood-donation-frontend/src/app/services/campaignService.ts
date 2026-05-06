@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -10,7 +10,16 @@ import { environment } from './../../environments/environment';
   providedIn: 'root'
 })
 export class CampaignService {
+  
+ openCampaignModal = signal(false);
 
+  openCampaign() {
+    this.openCampaignModal.set(true);
+  }
+
+  closeCampaign() {
+    this.openCampaignModal.set(false);
+  }
   private http = inject(HttpClient);
 
 private baseUrl = `${environment.baseurl}/api/campaigns`;  // ================= GET ALL =================

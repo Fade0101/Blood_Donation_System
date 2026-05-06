@@ -8,7 +8,11 @@ export interface Campaign {
 
   status?: 'ACTIVE' | 'COMPLETED';
 }
-
+export interface CampaignDonorsResponse {
+  success: boolean;
+  count: number;
+  data: any[];
+}
 export interface CreateCampaignRequest {
   campaignNumber: number;
 bloodBankName?: string
