@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { HttpResponse } from '@angular/common/http'; 
 
 import { CampaignService } from '../../services/campaignService';
 import { CampaignOperationsService } from '../../services/campaign-operations';
@@ -19,10 +20,10 @@ export class CampaignDetailsComponent implements OnInit {
   private campaignService = inject(CampaignService);
   private opsService = inject(CampaignOperationsService);
   private toastr = inject(ToastrService);
-  private fb = inject(FormBuilder);
 
   loading = signal(false);
   campaign = signal<any>(null);
+
 
   allDonors = signal<any[]>([]);
   campaignDonors = signal<any[]>([]);
@@ -30,9 +31,14 @@ export class CampaignDetailsComponent implements OnInit {
 
   campaignId!: string;
 
+
   filteredDonors = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    return this.allDonors().filter(d =>
+    const donors = this.allDonors();
+
+    if (!Array.isArray(donors)) return [];
+
+    return donors.filter(d =>
       d.name?.toLowerCase().includes(term) ||
       d.nationalId?.includes(term) ||
       d.phone?.includes(term)
@@ -50,48 +56,30 @@ export class CampaignDetailsComponent implements OnInit {
 
   loadInitialData() {
     this.loading.set(true);
-
     this.loadCampaign();
 
-    this.campaignService.getAllDonors().subscribe({
-      next: (donors) => {
-        this.allDonors.set(donors);
 
-        this.opsService.getCampaignDonors(this.campaignId).subscribe({
-          next: (campaignDonors) => {
-            this.campaignDonors.set(campaignDonors);
-            this.loading.set(false);
-          },
-          error: () => {
-            this.campaignDonors.set([]);
-            this.loading.set(false);
-          }
-        });
-      },
-      error: () => {
-        this.allDonors.set([]);
-        this.loading.set(false);
-      }
-    });
+
+
+
   }
 
   loadCampaign() {
     this.campaignService.getCampaignById(this.campaignId)
-      .subscribe(res => this.campaign.set(res));
+      .subscribe((res: any) => {
+        this.campaign.set(res.data || res);
+      });
   }
 
   isInCampaign(donorId: string): boolean {
-    return this.campaignDonors().some(d => d.id === donorId);
+    const donors = this.campaignDonors();
+
+    return donors.some(d => (d.donorId === donorId || d.id === donorId));
   }
 
   selectDonor(donor: any) {
     if (this.isInCampaign(donor.id)) {
-      this.toastr.warning('المتبرع موجود بالفعل');
-      return;
-    }
-
-    if (!donor.name || !donor.phone) {
-      this.toastr.error('لازم الاسم والموبايل');
+      this.toastr.warning('المتبرع موجود بالفعل في هذه الحملة');
       return;
     }
 
@@ -100,9 +88,7 @@ export class CampaignDetailsComponent implements OnInit {
       name: donor.name,
       phone: donor.phone,
       address: donor.address || '',
-      dateOfBirth: donor.dateOfBirth
-        ? new Date(donor.dateOfBirth).toISOString()
-        : undefined,
+      dateOfBirth: donor.dateOfBirth ? new Date(donor.dateOfBirth).toISOString() : undefined,
       offlineSyncId: crypto.randomUUID()
     };
 
@@ -110,24 +96,34 @@ export class CampaignDetailsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.loadInitialData();
-          this.toastr.success('تمت الإضافة');
-        },
-        error: (err) => {
-          this.toastr.error(
-            err?.error?.message || 'فشل الإضافة'
-          );
+          this.toastr.success('تمت إضافة المتبرع للحملة بنجاح');
         }
+
       });
   }
 
   exportCSV() {
-    this.opsService.exportCampaignDonors(this.campaignId)
-      .subscribe(blob => {
-        const url = window.URL.createObjectURL(blob);
+  this.opsService.exportCampaignDonors(this.campaignId)
+    .subscribe({
+      next: (response) => {
+        const blobData = response.body as Blob;
+        if (!blobData) return;
+
+        const contentDisposition = response.headers.get('content-disposition');
+
+
+        const campNumber = this.campaign()?.campaignNumber || this.campaignId;
+        const fileName = contentDisposition
+          ?.split('filename=')[1]
+          ?.replace(/"/g, '') || `campaign_${campNumber}_donors.csv`;
+
+        const url = window.URL.createObjectURL(blobData);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `campaign-${this.campaignId}.csv`;
+        a.download = fileName;
         a.click();
-      });
-  }
+        window.URL.revokeObjectURL(url);
+      }
+    });
+}
 }

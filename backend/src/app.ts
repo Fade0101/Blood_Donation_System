@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import routes from "./routes";
 import { errorHandler } from "./middlewares/errorHandler";
-import campaignRoutes from "./routes/campaign.routes";
 import syncRoutes from "./routes/sync.routes";
 
 
@@ -13,7 +12,7 @@ app.use(express.json());
 
 
 app.use("/api", routes);
-app.use('/api/sync', syncRoutes);
+app.use("/api/sync", syncRoutes);
 
 app.use(errorHandler);
 

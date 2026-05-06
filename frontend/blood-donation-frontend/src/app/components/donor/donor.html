@@ -42,7 +42,7 @@
               <div class="relative w-full sm:w-auto">
                 <input
                   type="text"
-                  placeholder="ابحث بالاسم..."
+                  placeholder="ابحث بالاسم او الرقم القومي او رقم الهاتف..."
                   (input)="onSearch($event)"
                   class="w-full sm:w-80 pr-12 pl-4 py-3 rounded-2xl border border-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 bg-white shadow-sm transition-all duration-300"
                 />
@@ -70,20 +70,20 @@
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="stat-card">
               <p>إجمالي المتبرعين</p>
-              <h2>{{ donors.length }}</h2>
+             <h2>{{ totalDonorsCount() }}</h2>
             </div>
-            <div class="stat-card">
-              <p>A+</p>
-              <h2>{{ count('A_POS') }}</h2>
-            </div>
-            <div class="stat-card">
-              <p>O+</p>
-              <h2>{{ count('O_POS') }}</h2>
-            </div>
-            <div class="stat-card">
-              <p>AB+</p>
-              <h2>{{ count('AB_POS') }}</h2>
-            </div>
+                  <div class="stat-card">
+            <p>A+</p>
+            <h2>{{ bloodStats()['A_POS'] || 0 }}</h2>
+          </div>
+          <div class="stat-card">
+            <p>O+</p>
+            <h2>{{ bloodStats()['O_POS'] || 0 }}</h2>
+          </div>
+          <div class="stat-card">
+            <p>AB+</p>
+            <h2>{{ bloodStats()['AB_POS'] || 0 }}</h2>
+          </div>
           </div>
           <!-- Blood Filter -->
           <div class="bg-white rounded-2xl p-5 shadow-sm border border-red-100">
@@ -157,7 +157,7 @@
               </button>
             </div>
           </div>
-          
+
         </div>
         <!-- RIGHT IMAGE CARD -->
         <div class="bg-white rounded-3xl shadow-xl border border-red-100 overflow-hidden relative">
@@ -177,9 +177,71 @@
           </div>
         </div>
       </div>
+      <!-- شريط الإحصائيات والتنقل (Toolbar) -->
+<div class="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-4 gap-4">
+
+  <!-- إجمالي المتبرعين (على اليمين) -->
+  <div class="flex items-center gap-3">
+    <div class="flex items-center justify-center w-10 h-10 bg-red-50 text-red-600 rounded-full border border-red-100">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+      </svg>
+    </div>
+    <div>
+      <p class="text-xs text-gray-500 font-medium">إجمالي المتبرعين</p>
+      <p class="text-lg font-bold text-gray-900">{{ totalDonorsCount() }} <span class="text-xs font-normal text-gray-500">متبرع</span></p>
+    </div>
+  </div>
+
+  <!-- أزرار التنقل (على اليسار) -->
+  <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
+
+    <!-- زر السابق -->
+    <button
+      (click)="prevPage()"
+      [disabled]="currentPage() === 1"
+      [class.text-gray-400]="currentPage() === 1"
+      [class.cursor-not-allowed]="currentPage() === 1"
+      [class.text-gray-700]="currentPage() !== 1"
+      [class.bg-white]="currentPage() !== 1"
+      [class.shadow-sm]="currentPage() !== 1"
+      [class.hover:text-red-600]="currentPage() !== 1"
+      class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center gap-1 cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+      السابق
+    </button>
+
+    <!-- مؤشر الصفحة -->
+    <div class="px-4 text-sm font-bold text-red-700">
+      {{ currentPage() }} <span class="text-gray-400 font-normal mx-1">/</span> {{ totalPages() }}
+    </div>
+
+    <!-- زر التالي -->
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage() === totalPages()"
+      [class.text-gray-400]="currentPage() === totalPages()"
+      [class.cursor-not-allowed]="currentPage() === totalPages()"
+      [class.text-gray-700]="currentPage() !== totalPages()"
+      [class.bg-white]="currentPage() !== totalPages()"
+      [class.shadow-sm]="currentPage() !== totalPages()"
+      [class.hover:text-red-600]="currentPage() !== totalPages()"
+      class="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 flex items-center gap-1 cursor-pointer">
+      التالي
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+    </button>
+
+  </div>
+</div>
       <!-- Table -->
+
       <div class="bg-white shadow-2xl rounded-3xl overflow-hidden border border-red-100">
         <div class="overflow-x-auto">
+
           <table class="w-full text-sm text-right">
             <thead class="bg-red-700 text-white">
               <tr>
@@ -193,7 +255,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (d of filteredDonors(); track d.id) {
+             @for (d of donors(); track d.id)  {
                 <tr class="border-b hover:bg-red-50 transition-all duration-300">
                   <!-- NAME -->
                   <td class="p-5 font-semibold text-gray-700">{{ d.name }}</td>
@@ -248,10 +310,12 @@
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   </div>
 </div>
+
 <!-- Modal -->
 @if (showModal) {
   <div class="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
