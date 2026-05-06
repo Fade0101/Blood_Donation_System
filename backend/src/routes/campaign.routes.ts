@@ -45,5 +45,9 @@ router.get(
   "/:campaignId/export",
   asyncHandler(campaignController.exportDonorsCsv)
 );
+router.get(
+  "/:campaignId/donors",
+  asyncHandler(campaignController.getDonorsforCampaign)
+);
 
 export default router;
