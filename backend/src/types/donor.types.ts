@@ -25,6 +25,7 @@ export const createDonorSchema = z.object({
 });
 
 export const updateDonorSchema = z.object({
+  nationalId: z.string().min(1).length(14).optional(),
   name: z.string().min(1).optional(),
   phone: z.string().min(1).optional(),
   address: z.string().optional(),

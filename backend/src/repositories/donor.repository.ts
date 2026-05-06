@@ -2,8 +2,37 @@ import prisma from "../config/prisma";
 import { CreateDonorDTO, UpdateDonorDTO } from "../types/donor.types";
 
 export const donorRepository = {
-  findAll() {
-    return prisma.donor.findMany({ orderBy: { createdAt: "desc" } });
+  getBloodTypeStats() {
+    return prisma.donor.groupBy({
+      by: ['bloodType'],
+      _count: { bloodType: true },
+    });
+  },
+findAll(skip: number = 0, take: number = 10, search?: string, bloodType?: string) {
+   
+    const whereCondition: any = {};
+    
+    if (search) {
+      whereCondition.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { phone: { contains: search, mode: "insensitive" } },
+        { nationalId: { contains: search, mode: "insensitive" } } // ضفنا الرقم القومي كهدية للـ UX
+      ];
+    }
+    
+    if (bloodType && bloodType !== 'ALL') {
+      whereCondition.bloodType = bloodType;
+    }
+
+    return prisma.$transaction([
+      prisma.donor.findMany({
+        where: whereCondition,
+        skip,
+        take,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.donor.count({ where: whereCondition }), 
+    ]);
   },
 
   findById(id: string) {

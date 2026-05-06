@@ -61,28 +61,30 @@ export const campaignService = {
     return await deleteCampaign(id);
   },
 
-  async generateCampaignCsv(campaignId: string, bloodType?: string) {
+async generateCampaignCsv(campaignId: string, bloodType?: string) {
     const records = await getCampaignDonors(campaignId, bloodType);
 
-    if (records.length === 0) {
-      throw new AppError(404, "No donors found for this campaign with specified criteria");
+    if (!records || records.length === 0) {
+      throw new AppError(404, "No donors found for this campaign");
     }
 
     const flatData = records.map((record) => ({
-      "National ID": ` ${record.donor.nationalId}`, 
-    "Name": record.donor.name,
-    "Phone": ` ${record.donor.phone}`,
-    "Address": record.donor.address || "N/A",
-    "Blood Type": record.donor.bloodType || "Unknown",
-    "Registration Date": record.registeredAt.toISOString().split('T')[0]
+      '   الاسم': record.donor.name,
+        'رقم الهاتف': `="${record.donor.phone}"`, 
+      '   الالرقم القومي': `="${record.donor.nationalId}"`,
+      
+      'فصيلة الدم': record.donor.bloodType 
+        ? record.donor.bloodType.replace('_POS', '+').replace('_NEG', '-') 
+        : 'غير محدد',
+       '    العنوان': record.donor.address || '-',
+      'تاريخ التسجيل': record.donor.createdAt 
+        ? new Date(record.donor.createdAt).toLocaleDateString('ar-EG') 
+        : '-'
     }));
 
-    const json2csvParser = new Parser();
-    const csvString = json2csvParser.parse(flatData);
-
-    return csvString;
-  },
-
+    const json2csvParser = new Parser({ withBOM: false }); 
+    return json2csvParser.parse(flatData);
+},
   async getCampaignDonors(campaignId: string, bloodTypeFilter?: string) {
     const campaign = await getCampaignById(campaignId);
     if (!campaign) {

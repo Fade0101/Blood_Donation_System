@@ -18,10 +18,14 @@ export class Donor implements OnInit {
   private donorService = inject(DonorsService);
   private fb = inject(FormBuilder);
   private toastr = inject(ToastrService);
-
+currentPage = signal<number>(1);
+  pageSize = signal<number>(10);
+  totalPages = signal<number>(1);
+  totalDonorsCount = signal<number>(0);
   donors = signal<any[]>([]);
   searchText = signal<string>('');
   selectedBloodFilter = signal<string>('ALL');
+  bloodStats = signal<any>({});
 
   donorForm = this.fb.group({
     nationalId: ['', [Validators.required, Validators.minLength(14), Validators.maxLength(14)]],
@@ -54,20 +58,53 @@ export class Donor implements OnInit {
     this.getDonors();
   }
 
-  getDonors() {
-    this.donorService.getAllDonors().subscribe({
-      next: (res: any[]) => this.donors.set(Array.isArray(res) ? res : []),
-      error: () => this.toastr.error('فشل تحميل المتبرعين', 'Error')
-    });
+getDonors() {
+
+    this.donorService.getAllDonors(this.currentPage(), this.pageSize(), this.searchText(), this.selectedBloodFilter())
+      .subscribe({
+        next: (res: any) => {
+          const donorsArray = res?.data || [];
+          this.donors.set(Array.isArray(donorsArray) ? donorsArray : []);
+
+          if (res?.meta) {
+            this.totalPages.set(res.meta.totalPages);
+            this.totalDonorsCount.set(res.meta.total);
+          }
+          if (res?.stats) {
+            this.bloodStats.set(res.stats);
+          }
+        },
+        error: () => this.toastr.error('فشل تحميل المتبرعين', 'Error')
+      });
   }
 
   onSearch(event: any) {
     this.searchText.set(event.target.value ?? '');
+    this.currentPage.set(1);
+    this.getDonors();
   }
 
   filterByBlood(type: string) {
     this.selectedBloodFilter.set(type);
+    this.currentPage.set(1);
+    this.getDonors();
   }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update(p => p + 1);
+      this.getDonors();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update(p => p - 1);
+      this.getDonors();
+    }
+  }
+
+
 
   count(type: string): number {
     return this.donors().filter(d => d.bloodType === type).length;
@@ -98,7 +135,7 @@ export class Donor implements OnInit {
       name: v.name!,
       phone: v.phone!,
       address: v.address || '',
-      bloodType: v.bloodType || '',
+    bloodType: v.bloodType ? v.bloodType : undefined,
       church: v.church || '',
       confessionFather: v.confessionFather || '',
       dateOfBirth: this.formatDate(v.dateOfBirth),
@@ -174,7 +211,7 @@ export class Donor implements OnInit {
       name: v.name!,
       phone: v.phone!,
       address: v.address || '',
-      bloodType: v.bloodType || '',
+     bloodType: v.bloodType ? v.bloodType : undefined,
       church: v.church || '',
       confessionFather: v.confessionFather || '',
       dateOfBirth: this.formatDate(v.dateOfBirth),

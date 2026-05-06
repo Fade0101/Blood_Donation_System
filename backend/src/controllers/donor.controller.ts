@@ -2,9 +2,15 @@ import { Request, Response } from "express";
 import { donorService } from "../services/donor.service";
 
 export const donorController = {
-  async getAll(_req: Request, res: Response) {
-    const donors = await donorService.getAllDonors();
-    res.json(donors);
+ async getAll(req: Request, res: Response) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string;
+    const bloodType = req.query.bloodType as string;
+const includeStats = req.query.includeStats === 'true';
+const result = await donorService.getAllDonors(page, limit, search, bloodType, includeStats);
+
+    res.json({ success: true, data: result.data, meta: result.meta ,stats: result.stats});
   },
 
   async getById(req: Request, res: Response) {
