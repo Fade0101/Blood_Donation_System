@@ -1,11 +1,13 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 
 import { CampaignService } from '../../services/campaignService';
 import { CampaignOperationsService } from '../../services/campaign-operations';
+import { link } from 'fs';
 
 @Component({
   selector: 'app-campaign-details',
@@ -76,7 +78,7 @@ export class CampaignDetailsComponent implements OnInit {
   }
 
   loadAllDonors() {
-    this.campaignService.getAllDonors()
+    this.campaignService.getAllDonors(10000)
       .subscribe((res: any) => {
         const data = res.data || res;
         this.allDonors.set(Array.isArray(data) ? data : []);
@@ -128,7 +130,13 @@ export class CampaignDetailsComponent implements OnInit {
 
   exportCSV() {
     this.opsService.exportCampaignDonors(this.campaignId)
-      .subscribe((blob) => {
+      .subscribe((response: HttpResponse<Blob>) => {
+        const blob = response.body;
+        if (!blob) {
+          this.toastr.error('تعذر تصدير الملف حالياً');
+          return;
+        }
+
         const url = window.URL.createObjectURL(blob);
 
         const a = document.createElement('a');

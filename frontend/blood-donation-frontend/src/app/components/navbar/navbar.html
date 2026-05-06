@@ -1,148 +1,145 @@
 <nav class="backdrop-blur-md bg-red-900/80 text-white shadow-lg fixed w-full z-50">
-
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="flex justify-between items-center h-16">
+  <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+    <div class="flex justify-between items-center h-14">
 
       <!-- LOGO -->
-      <div class="flex items-center gap-3 cursor-pointer hover:scale-105 transition group">
-
-        <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-lg border border-white/20
-                    group-hover:scale-110 transition duration-300">
-
-          <img
-            src="/HabashyBblood.jpg"
-            alt="Habashy Blood"
-            class="w-full h-full object-cover"
-          />
-
+      <div class="flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:scale-105 transition group">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg overflow-hidden shadow-md border border-white/20 group-hover:scale-110 transition duration-300">
+          <img src="/HabashyBblood.jpg" alt="Habashy Blood" class="w-full h-full object-cover" />
         </div>
-
-        <span class="font-bold text-xl tracking-wide group-hover:text-red-200 transition">
-          تبرع دم حبشي
-        </span>
-
+        <span class="font-bold text-sm sm:text-base tracking-wide group-hover:text-red-200 transition hidden sm:inline">
+         حملة الحبشي         </span>
       </div>
 
-      <!-- MENU -->
-      <div class="hidden md:flex items-center gap-8 text-sm">
-
-        <!-- HOME -->
+      <!-- DESKTOP MENU -->
+      <div class="hidden lg:flex items-center gap-6 text-xs">
         <a *ngIf="authService.isAuthenticated()" routerLink="/home"
-           class="relative flex items-center gap-2 hover:text-red-200 transition group">
-
-          <i class="fa-solid fa-house"></i>
+           class="relative flex items-center gap-1 hover:text-red-200 transition group font-medium">
+          <i class="fa-solid fa-house text-sm"></i>
           الرئيسية
-
-          <span
-            class="absolute left-0 -bottom-1 h-[2px] w-0 bg-red-300 rounded-full
-                   transition-all duration-300 group-hover:w-full">
-          </span>
-
+          <span class="absolute left-0 -bottom-0.5 h-0.5 w-0 bg-red-300 rounded-full transition-all duration-300 group-hover:w-full"></span>
         </a>
 
-        <!-- DONORS -->
         <a *ngIf="authService.isAuthenticated()" routerLink="/donors"
-           class="relative flex items-center gap-2 hover:text-red-200 transition group">
-
-          <i class="fa-solid fa-users"></i>
+           class="relative flex items-center gap-1 hover:text-red-200 transition group font-medium">
+          <i class="fa-solid fa-users text-sm"></i>
           المتبرعين
-
-          <span
-            class="absolute left-0 -bottom-1 h-[2px] w-0 bg-red-300 rounded-full
-                   transition-all duration-300 group-hover:w-full">
-          </span>
-
+          <span class="absolute left-0 -bottom-0.5 h-0.5 w-0 bg-red-300 rounded-full transition-all duration-300 group-hover:w-full"></span>
         </a>
 
-        <!-- CAMPAIGNS -->
         <a *ngIf="authService.isAuthenticated()" routerLink="/campaigns"
-           class="relative flex items-center gap-2 hover:text-red-200 transition group">
-
-          <i class="fa-solid fa-bullhorn"></i>
+           class="relative flex items-center gap-1 hover:text-red-200 transition group font-medium">
+          <i class="fa-solid fa-bullhorn text-sm"></i>
           الحملات
-
-          <span
-            class="absolute left-0 -bottom-1 h-[2px] w-0 bg-red-300 rounded-full
-                   transition-all duration-300 group-hover:w-full">
-          </span>
-
+          <span class="absolute left-0 -bottom-0.5 h-0.5 w-0 bg-red-300 rounded-full transition-all duration-300 group-hover:w-full"></span>
         </a>
 
-        <!-- ADMIN DASHBOARD -->
         <a *ngIf="authService.isAdmin()" routerLink="/admin"
-           class="relative flex items-center gap-2 hover:text-red-200 transition group">
-
-          <i class="fa-solid fa-shield"></i>
+           class="relative flex items-center gap-1 hover:text-red-200 transition group font-medium">
+          <i class="fa-solid fa-shield text-sm"></i>
           لوحة التحكم
-
-          <span
-            class="absolute left-0 -bottom-1 h-[2px] w-0 bg-red-300 rounded-full
-                   transition-all duration-300 group-hover:w-full">
-          </span>
-
+          <span class="absolute left-0 -bottom-0.5 h-0.5 w-0 bg-red-300 rounded-full transition-all duration-300 group-hover:w-full"></span>
         </a>
 
-        <!-- STATS -->
-        <a *ngIf="authService.isAuthenticated()" class="relative flex items-center gap-2 hover:text-red-200 transition group">
-
-          <i class="fa-solid fa-chart-line"></i>
+        <a *ngIf="authService.isAuthenticated()" class="relative flex items-center gap-1 hover:text-red-200 transition group font-medium">
+          <i class="fa-solid fa-chart-line text-sm"></i>
           الإحصائيات
-
-          <span
-            class="absolute left-0 -bottom-1 h-[2px] w-0 bg-red-300 rounded-full
-                   transition-all duration-300 group-hover:w-full">
-          </span>
-
+          <span class="absolute left-0 -bottom-0.5 h-0.5 w-0 bg-red-300 rounded-full transition-all duration-300 group-hover:w-full"></span>
         </a>
-
       </div>
 
       <!-- ACTIONS -->
-      <div class="flex items-center gap-4">
-
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <!-- NEW CAMPAIGN BUTTON (Hidden on mobile) -->
         <button *ngIf="authService.isAuthenticated()"
-          class="bg-white text-red-700 px-4 py-1.5 rounded-xl font-semibold
-                 hover:bg-gray-200 transition hover:scale-105 flex items-center gap-2 shadow-md">
-
-          <i class="fa-solid fa-plus"></i>
-          حملة جديدة
-
+          (click)="addCampaign()"
+          class="hidden md:flex items-center gap-1 bg-white text-red-700 px-2.5 sm:px-3 py-1 rounded-md font-semibold text-xs
+                 hover:bg-gray-200 transition hover:scale-105 shadow-sm">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span class="hidden sm:inline">حملة</span>
         </button>
 
-        <!-- USER MENU -->
-        <div *ngIf="authService.isAuthenticated()" class="flex items-center gap-3">
-          <span class="text-sm">{{ authService.currentUser()?.email }}</span>
+        <!-- USER MENU (Desktop) -->
+        <div *ngIf="authService.isAuthenticated()" class="hidden sm:flex items-center gap-2">
+          <span class="text-xs font-medium truncate max-w-[120px]">{{ authService.currentUser()?.email }}</span>
           <button
             (click)="logout()"
-            class="bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold
-                   hover:bg-red-800 transition flex items-center gap-2">
-            <i class="fa-solid fa-sign-out-alt"></i>
-            تسجيل الخروج
+            class="bg-red-700 text-white px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold
+                   hover:bg-red-800 transition flex items-center gap-0.5 sm:gap-1">
+            <i class="fa-solid fa-sign-out-alt text-xs"></i>
+            <span class="hidden sm:inline">خروج</span>
           </button>
         </div>
 
-        <!-- LOGIN/REGISTER -->
-        <div *ngIf="!authService.isAuthenticated()" class="flex items-center gap-2">
+        <!-- LOGIN/REGISTER (Desktop) -->
+        <div *ngIf="!authService.isAuthenticated()" class="hidden sm:flex items-center gap-1.5">
           <a routerLink="/login"
-             class="bg-white text-red-700 px-3 py-1.5 rounded-lg text-sm font-semibold
+             class="bg-white text-red-700 px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold
                     hover:bg-gray-200 transition">
             دخول
           </a>
           <a routerLink="/register"
-             class="bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold
+             class="bg-red-700 text-white px-2.5 sm:px-3 py-1 rounded-md text-xs font-semibold
                     hover:bg-red-800 transition">
             تسجيل
           </a>
         </div>
 
-        <!-- MOBILE -->
-        <button class="md:hidden text-xl">
-          <i class="fa-solid fa-bars"></i>
+        <!-- MOBILE MENU BUTTON -->
+        <button (click)="toggleMobileMenu()" class="lg:hidden text-lg hover:text-red-200 transition p-1">
+          <i [ngClass]="mobileMenuOpen() ? 'fa-solid fa-times' : 'fa-solid fa-bars'"></i>
         </button>
-
       </div>
 
     </div>
-  </div>
 
+    <!-- MOBILE MENU -->
+    <div *ngIf="mobileMenuOpen()" class="lg:hidden border-t border-red-800 bg-red-950/50 backdrop-blur-sm">
+      <div class="px-3 py-2 space-y-1.5">
+        <!-- Mobile Navigation -->
+        <a *ngIf="authService.isAuthenticated()" routerLink="/home" (click)="mobileMenuOpen.set(false)"
+           class="block px-3 py-1.5 rounded-md hover:bg-red-800 transition font-medium text-xs">
+          <i class="fa-solid fa-house mr-2"></i>الرئيسية
+        </a>
+
+        <a *ngIf="authService.isAuthenticated()" routerLink="/donors" (click)="mobileMenuOpen.set(false)"
+           class="block px-3 py-1.5 rounded-md hover:bg-red-800 transition font-medium text-xs">
+          <i class="fa-solid fa-users mr-2"></i>المتبرعين
+        </a>
+
+        <a *ngIf="authService.isAuthenticated()" routerLink="/campaigns" (click)="mobileMenuOpen.set(false)"
+           class="block px-3 py-1.5 rounded-md hover:bg-red-800 transition font-medium text-xs">
+          <i class="fa-solid fa-bullhorn mr-2"></i>الحملات
+        </a>
+
+        <a *ngIf="authService.isAdmin()" routerLink="/admin" (click)="mobileMenuOpen.set(false)"
+           class="block px-3 py-1.5 rounded-md hover:bg-red-800 transition font-medium text-xs">
+          <i class="fa-solid fa-shield mr-2"></i>لوحة التحكم
+        </a>
+
+        <!-- Mobile User Menu -->
+        <div *ngIf="authService.isAuthenticated()" class="border-t border-red-800 pt-1.5 mt-1.5 space-y-1">
+          <p class="px-3 py-1 text-xs text-red-200">{{ authService.currentUser()?.email }}</p>
+          <button
+            (click)="logout(); mobileMenuOpen.set(false)"
+            class="w-full text-left px-3 py-1.5 rounded-md hover:bg-red-800 transition font-medium text-xs">
+            <i class="fa-solid fa-sign-out-alt mr-2"></i>تسجيل الخروج
+          </button>
+        </div>
+
+        <!-- Mobile Auth Buttons -->
+        <div *ngIf="!authService.isAuthenticated()" class="border-t border-red-800 pt-1.5 mt-1.5 space-y-1">
+          <a routerLink="/login" (click)="mobileMenuOpen.set(false)"
+             class="block w-full text-center px-3 py-1.5 rounded-md bg-white text-red-700 font-semibold text-xs hover:bg-gray-200 transition">
+            دخول
+          </a>
+          <a routerLink="/register" (click)="mobileMenuOpen.set(false)"
+             class="block w-full text-center px-3 py-1.5 rounded-md bg-red-700 text-white font-semibold text-xs hover:bg-red-800 transition">
+            تسجيل
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </nav>
+

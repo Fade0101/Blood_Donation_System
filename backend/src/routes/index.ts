@@ -6,8 +6,8 @@ import authRoutes from "./auth.routes";
 
 const router = Router();
 
-router.use("/auth", authRoutes); 
-router.use("/users", authRoutes); 
+router.use("/auth", authRoutes);
+router.use("/users", authRoutes);
 router.use("/donors", donorRoutes);
 router.use("/campaigns", campaignRoutes);
 router.use("/imports", importRoutes);

@@ -10,7 +10,7 @@ import { environment } from './../../environments/environment';
   providedIn: 'root'
 })
 export class CampaignService {
-  
+
  openCampaignModal = signal(false);
 
   openCampaign() {
@@ -45,10 +45,10 @@ private baseUrl = `${environment.baseurl}/api/campaigns`;  // ================= 
   // ================= DELETE =================
 deleteCampaign(id: string) {
   return this.http.delete(`${this.baseUrl}/${id}`, {
-    responseType: 'text' as 'json' // 🔥 مهم جدًا مع 204
+    responseType: 'text' as 'json'
   });
 }
-  getAllDonors() {
+  getAllDonors(limit: number=10000): Observable<any[]>  {
   return this.http.get<any[]>(`${environment.baseurl}/api/donors`);
 }
 
