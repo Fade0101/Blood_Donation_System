@@ -52,4 +52,14 @@ export const campaignController = {
     res.setHeader("Content-Disposition", `attachment; filename=campaign_${campaign.campaignNumber}_donors.csv`);
   res.status(200).send(buffer);
   },
+  async getDonorsforCampaign(req: Request, res: Response) {
+    const { campaignId } = req.params;
+    const { bloodType } = req.query;
+    const donors = await campaignService.getCampaignDonors(campaignId as string, bloodType as string | undefined);
+   res.json({
+  success: true,
+  count: donors.length,
+  data: donors
+});
+  },
 };

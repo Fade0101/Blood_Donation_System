@@ -82,4 +82,16 @@ export const campaignService = {
 
     return csvString;
   },
+
+  async getCampaignDonors(campaignId: string, bloodTypeFilter?: string) {
+    const campaign = await getCampaignById(campaignId);
+    if (!campaign) {
+      throw new AppError(404, "الحملة غير موجودى");
+    }
+    const registrations = await getCampaignDonors(campaignId, bloodTypeFilter);
+return registrations.map(reg => ({
+      ...reg.donor,
+      offlineSyncId: reg.offlineSyncId
+    }));
+  }
 };
