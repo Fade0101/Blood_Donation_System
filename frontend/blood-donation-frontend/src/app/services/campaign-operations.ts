@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { RegisterDonorRequest, RegisterDonorResponse } from '../interfaces/campaign';
+import { CampaignDonorsResponse, RegisterDonorRequest, RegisterDonorResponse } from '../interfaces/campaign';
 
 @Injectable({
   providedIn: 'root',
@@ -44,6 +44,7 @@ markAsDonated(campaignId: string, donorId: string) {
   );
 }
 
+
 searchDonors(query: string): Observable<any[]> {
   return this.http.get<any[]>(
     `${environment.baseurl}/donors/search`,
@@ -53,14 +54,18 @@ searchDonors(query: string): Observable<any[]> {
   );
 }
 
-getCampaignDonors(campaignId: string) {
-  return this.http.get<any[]>(
-    `${this.apiUrl}/${campaignId}/donors`
+
+getCampaignDonors(campaignId: string, bloodType?: string) {
+  let params = new HttpParams();
+
+  if (bloodType) {
+    params = params.set('bloodType', bloodType);
+  }
+
+  return this.http.get<CampaignDonorsResponse>(
+    `${this.apiUrl}/${campaignId}/donors`,
+    { params }
   );
 }
-removeDonor(campaignId: string, donorId: string) {
-  return this.http.delete(
-    `${this.apiUrl}/${campaignId}/donors/${donorId}`
-  );
-}
+
 }

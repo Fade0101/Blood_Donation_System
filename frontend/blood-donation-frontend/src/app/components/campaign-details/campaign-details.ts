@@ -1,9 +1,8 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { HttpResponse } from '@angular/common/http'; 
 
 import { CampaignService } from '../../services/campaignService';
 import { CampaignOperationsService } from '../../services/campaign-operations';
@@ -16,27 +15,36 @@ import { CampaignOperationsService } from '../../services/campaign-operations';
   styleUrl: './campaign-details.css',
 })
 export class CampaignDetailsComponent implements OnInit {
+
   private route = inject(ActivatedRoute);
   private campaignService = inject(CampaignService);
   private opsService = inject(CampaignOperationsService);
   private toastr = inject(ToastrService);
 
+  // ================= STATE =================
   loading = signal(false);
+
   campaign = signal<any>(null);
-
-
   allDonors = signal<any[]>([]);
   campaignDonors = signal<any[]>([]);
   searchTerm = signal('');
 
   campaignId!: string;
 
+  // ================= DERIVED =================
+  campaignDonorIds = computed(() => {
+    return new Set(
+      this.campaignDonors().map(d => d.donorId || d.id || d._id)
+    );
+  });
+
+  isInCampaign = (id: string) => {
+    return this.campaignDonorIds().has(id);
+  };
 
   filteredDonors = computed(() => {
     const term = this.searchTerm().toLowerCase();
-    const donors = this.allDonors();
-
-    if (!Array.isArray(donors)) return [];
+    const donors = this.allDonors() || [];
 
     return donors.filter(d =>
       d.name?.toLowerCase().includes(term) ||
@@ -48,38 +56,50 @@ export class CampaignDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.campaignId = params['id'];
-      if (this.campaignId) {
-        this.loadInitialData();
-      }
+      this.loadData();
     });
   }
 
-  loadInitialData() {
+  // ================= LOAD =================
+  loadData() {
     this.loading.set(true);
+
     this.loadCampaign();
-
-
-
-
-
+    this.loadAllDonors();
+    this.loadCampaignDonors();
   }
 
-  loadCampaign() {
-    this.campaignService.getCampaignById(this.campaignId)
-      .subscribe((res: any) => {
-        this.campaign.set(res.data || res);
-      });
-  }
+loadCampaign() {
+  this.campaignService.getCampaignById(this.campaignId)
+    .subscribe((res: any) => {
+      this.campaign.set(res);
+    });
+}
+loadAllDonors() {
+  this.campaignService.getAllDonors()
+    .subscribe((res: any) => {
+      this.allDonors.set(res.data ?? []);
+    });
+}
 
-  isInCampaign(donorId: string): boolean {
-    const donors = this.campaignDonors();
+ loadCampaignDonors() {
+  this.opsService.getCampaignDonors(this.campaignId)
+    .subscribe({
+      next: (res: any) => {
+        this.campaignDonors.set(res.data ?? []);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.campaignDonors.set([]);
+        this.loading.set(false);
+      }
+    })}
 
-    return donors.some(d => (d.donorId === donorId || d.id === donorId));
-  }
-
+  // ================= ACTIONS =================
   selectDonor(donor: any) {
+
     if (this.isInCampaign(donor.id)) {
-      this.toastr.warning('المتبرع موجود بالفعل في هذه الحملة');
+      this.toastr.warning('المتبرع موجود بالفعل');
       return;
     }
 
@@ -88,42 +108,34 @@ export class CampaignDetailsComponent implements OnInit {
       name: donor.name,
       phone: donor.phone,
       address: donor.address || '',
-      dateOfBirth: donor.dateOfBirth ? new Date(donor.dateOfBirth).toISOString() : undefined,
+      dateOfBirth: donor.dateOfBirth
+        ? new Date(donor.dateOfBirth).toISOString()
+        : undefined,
       offlineSyncId: crypto.randomUUID()
     };
 
     this.opsService.registerDonorToCampaign(this.campaignId, payload)
       .subscribe({
         next: () => {
-          this.loadInitialData();
-          this.toastr.success('تمت إضافة المتبرع للحملة بنجاح');
+          this.toastr.success('تمت الإضافة بنجاح');
+          this.loadCampaignDonors();
         }
-
       });
   }
 
   exportCSV() {
-  this.opsService.exportCampaignDonors(this.campaignId)
-    .subscribe({
-      next: (response) => {
-        const blobData = response.body as Blob;
-        if (!blobData) return;
+    this.opsService.exportCampaignDonors(this.campaignId)
+      .subscribe((res) => {
 
-        const contentDisposition = response.headers.get('content-disposition');
+        const blob = res.body!;
+        const url = window.URL.createObjectURL(blob);
 
-
-        const campNumber = this.campaign()?.campaignNumber || this.campaignId;
-        const fileName = contentDisposition
-          ?.split('filename=')[1]
-          ?.replace(/"/g, '') || `campaign_${campNumber}_donors.csv`;
-
-        const url = window.URL.createObjectURL(blobData);
         const a = document.createElement('a');
         a.href = url;
-        a.download = fileName;
+        a.download = `campaign_${this.campaign()?.campaignNumber || this.campaignId}.csv`;
         a.click();
+
         window.URL.revokeObjectURL(url);
-      }
-    });
-}
+      });
+  }
 }
