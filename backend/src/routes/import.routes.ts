@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { importController } from "../controllers/import.controller";
-import { asyncHandler } from "../middlewares/asyncHandler";
+import { catchAsync } from "../utils/catchAsync";
 
 // Shared multer configuration for all import endpoints
 const upload = multer({
@@ -22,14 +22,14 @@ const router = Router();
 router.post(
   "/blood-bank",
   upload.single("file"),
-  asyncHandler(importController.importBloodBank)
+  catchAsync(importController.importBloodBank)
 );
 
 // Legacy Import - for old system migration
 router.post(
   "/legacy",
   upload.single("file"),
-  asyncHandler(importController.importLegacy)
+  catchAsync(importController.importLegacy)
 );
 
 export default router;

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { donorController } from "../controllers/donor.controller";
-import { asyncHandler } from "../middlewares/asyncHandler";
+import { catchAsync } from "../utils/catchAsync";
 import { validateRequest } from "../middlewares/validationMiddleware";
 import {
   createDonorSchema,
@@ -10,28 +10,28 @@ import {
 
 const router = Router();
 
-router.get("/", asyncHandler(donorController.getAll));
-router.get("/search", asyncHandler(donorController.search));
+router.get("/", catchAsync(donorController.getAll));
+router.get("/search", catchAsync(donorController.search));
 router.get(
   "/:id",
   validateRequest(donorIdParamSchema, "params"),
-  asyncHandler(donorController.getById)
+  catchAsync(donorController.getById)
 );
 router.post(
   "/",
   validateRequest(createDonorSchema, "body"),
-  asyncHandler(donorController.create)
+  catchAsync(donorController.create)
 );
 router.put(
   "/:id",
   validateRequest(donorIdParamSchema, "params"),
   validateRequest(updateDonorSchema, "body"),
-  asyncHandler(donorController.update)
+  catchAsync(donorController.update)
 );
 router.delete(
   "/:id",
   validateRequest(donorIdParamSchema, "params"),
-  asyncHandler(donorController.remove)
+  catchAsync(donorController.remove)
 );
 
 export default router;

@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { RegisterDonorRequest, RegisterDonorResponse } from '../interfaces/campaign';
+import { CampaignDonorsResponse, RegisterDonorRequest, RegisterDonorResponse } from '../interfaces/campaign';
 
 @Injectable({
   providedIn: 'root',
@@ -10,8 +10,7 @@ import { RegisterDonorRequest, RegisterDonorResponse } from '../interfaces/campa
 export class CampaignOperationsService {
   private http = inject(HttpClient);
 
-private apiUrl = `${environment.baseurl}/api/campaigns`;  
-  // ================= REGISTER DONOR =================
+private apiUrl = `${environment.baseurl}/api/campaigns`;
   registerDonorToCampaign(
     campaignId: string,
     payload: RegisterDonorRequest,
@@ -20,18 +19,18 @@ private apiUrl = `${environment.baseurl}/api/campaigns`;
   }
 
   // ================= EXPORT CSV =================
-  exportCampaignDonors(campaignId: string, bloodType?: string): Observable<Blob> {
-    let params = new HttpParams();
-
-    if (bloodType) {
-      params = params.set('bloodType', bloodType);
-    }
-
-    return this.http.get(`${this.apiUrl}/${campaignId}/export`, {
-      params,
-      responseType: 'blob',
-    });
+exportCampaignDonors(campaignId: string, bloodType?: string): Observable<HttpResponse<Blob>> {
+  let params = new HttpParams();
+  if (bloodType) {
+    params = params.set('bloodType', bloodType);
   }
+
+  return this.http.get(`${this.apiUrl}/${campaignId}/export`, {
+    params,
+    responseType: 'blob',
+    observe: 'response'
+  });
+}
 
 getCampaignStats(campaignId: string) {
   return this.http.get<any>(
@@ -45,7 +44,7 @@ markAsDonated(campaignId: string, donorId: string) {
   );
 }
 
-// ================= SEARCH DONORS =================
+
 searchDonors(query: string): Observable<any[]> {
   return this.http.get<any[]>(
     `${environment.baseurl}/donors/search`,
@@ -55,14 +54,18 @@ searchDonors(query: string): Observable<any[]> {
   );
 }
 
-getCampaignDonors(campaignId: string) {
-  return this.http.get<any[]>(
-    `${this.apiUrl}/${campaignId}/donors`
+
+getCampaignDonors(campaignId: string, bloodType?: string) {
+  let params = new HttpParams();
+
+  if (bloodType) {
+    params = params.set('bloodType', bloodType);
+  }
+
+  return this.http.get<CampaignDonorsResponse>(
+    `${this.apiUrl}/${campaignId}/donors`,
+    { params }
   );
 }
-removeDonor(campaignId: string, donorId: string) {
-  return this.http.delete(
-    `${this.apiUrl}/${campaignId}/donors/${donorId}`
-  );
-}
+
 }

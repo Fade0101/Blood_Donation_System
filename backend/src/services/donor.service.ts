@@ -2,6 +2,7 @@ import { Donor } from "@prisma/client";
 import { donorRepository } from "../repositories/donor.repository";
 import { CreateDonorDTO, DonorWithAge, UpdateDonorDTO } from "../types/donor.types";
 import { AppError } from "../middlewares/errorHandler";
+import { skip } from "@prisma/client/runtime/library";
 
 function calculateAge(dateOfBirth: Date | null): number | null {
   if (!dateOfBirth) return null;
@@ -19,11 +20,27 @@ function withAge(donor: Donor): DonorWithAge {
 }
 
 export const donorService = {
-  async getAllDonors(): Promise<DonorWithAge[]> {
-    const donors = await donorRepository.findAll();
-    return donors.map(withAge);
+  
+async getAllDonors(page: number = 1, limit: number = 20, search?: string, bloodType?: string,includeStats: boolean =false) {
+    const skip = (page - 1) * limit;
+    
+   
+    const [donors, total] = await donorRepository.findAll(skip, limit, search, bloodType);    
+    const donorsWithAge = donors.map((donor) => withAge(donor));
+    let stats = null ; 
+    if(includeStats) {
+const rawStats = await donorRepository.getBloodTypeStats();
+stats = rawStats.reduce((acc: any, curr) => {
+        if (curr.bloodType) acc[curr.bloodType] = curr._count.bloodType;
+        return acc;
+      }, {});
+    }
+    return {
+      data: donorsWithAge,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+      stats,
+    };
   },
-
   async getDonorById(id: string): Promise<DonorWithAge> {
     const donor = await donorRepository.findById(id);
     if (!donor) throw new AppError(404, "Donor not found");

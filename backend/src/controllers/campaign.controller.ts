@@ -37,19 +37,29 @@ export const campaignController = {
     const { campaignId } = req.params;
     const { bloodType } = req.query;
 
-    const csvData = await campaignService.generateCampaignCsv(
+   const csvData = await campaignService.generateCampaignCsv(
       campaignId as string,
       bloodType as string | undefined
     );
-    const buffer = Buffer.concat([
+   const buffer = Buffer.concat([
       Buffer.from('\uFEFF', 'utf-8'),
       Buffer.from(csvData, 'utf-8')
     ]);
     const bom = '\uFEFF';
     const campaign = await campaignService.getCampaignById(campaignId as string);
-
-   res.setHeader("Content-Type", "text/csv; charset=utf-8");
-    res.setHeader("Content-Disposition", `attachment; filename=campaign_${campaign.campaignNumber}_donors.csv`);
-  res.status(200).send(buffer);
+    const fileName = `campaign_${campaign.campaignNumber}_donors.csv`;
+res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+res.setHeader("Content-Disposition", `attachment; filename="campaign_${campaign.campaignNumber}_donors.csv"`);
+res.status(200).send(buffer);
+  },
+  async getDonorsforCampaign(req: Request, res: Response) {
+    const { campaignId } = req.params;
+    const { bloodType } = req.query;
+    const donors = await campaignService.getCampaignDonors(campaignId as string, bloodType as string | undefined);
+   res.json({
+  success: true,
+  count: donors.length,
+  data: donors
+});
   },
 };

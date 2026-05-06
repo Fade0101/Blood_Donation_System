@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { Prisma } from "@prisma/client";
 import { ZodError, ZodIssue } from "zod";
 
 export class AppError extends Error {
@@ -50,8 +51,28 @@ export const errorHandler = (
     return;
   }
 
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (err.code === "P2002") {
+      res.status(400).json({
+        success: false,
+        message: "عفواً، هذه البيانات مسجلة بالفعل في النظام. لا يمكن التكرار.",
+        error: err.meta ?? null
+      });
+      return;
+    }
+
+    if (err.code === "P2025") {
+      res.status(404).json({
+        success: false,
+        message: "عفواً، السجل المطلوب غير موجود.",
+        error: err.meta ?? null
+      });
+      return;
+    }
+  }
+
   // Handle JSON parse errors
-  if (err instanceof SyntaxError && 'body' in err) {
+  if (err instanceof SyntaxError && "body" in err) {
     res.status(400).json({
       success: false,
       message: "صيغة JSON غير صحيحة",
@@ -66,10 +87,7 @@ export const errorHandler = (
   console.error(err);
   res.status(500).json({
     success: false,
-    message: "خطأ في السيرفر",
-    error: {
-      code: "INTERNAL_SERVER_ERROR",
-      details: null
-    }
+    message: "حدث خطأ غير متوقع في السيرفر.",
+    error: err instanceof Error ? err.message : null
   });
 };

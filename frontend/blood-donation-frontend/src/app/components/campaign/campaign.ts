@@ -13,7 +13,7 @@ import { DonorsService } from '../../services/donorsService';
   selector: 'app-campaign',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './campaign.html',
+templateUrl: './campaign.html',
   styleUrl: './campaign.css',
 })
 export class CampaignComponent implements OnInit {
@@ -30,7 +30,7 @@ export class CampaignComponent implements OnInit {
   loading = signal(false);
   errorMessage = signal<string | null>(null);
 
-  showModal = signal(false);
+  showModal = this.campaignService.openCampaignModal;
   submitting = signal(false);
   isEditMode = signal(false);
   selectedId = signal<string | null>(null);
@@ -85,7 +85,7 @@ export class CampaignComponent implements OnInit {
 
   loadCampaignDonors(campaignId: string) {
     this.campaignOperationsService.getCampaignDonors(campaignId).subscribe({
-      next: (res) => this.campaignDonors.set(res),
+      next: (res) => this.campaignDonors.set(res.data),
       error: (err) => console.error('Load Campaign Donors Error:', err)
     });
   }
@@ -107,15 +107,13 @@ export class CampaignComponent implements OnInit {
     this.router.navigate(['/campaign-details', id]);
   }
 
-  openModal() {
-    this.showModal.set(true);
-  }
-
-  closeModal() {
-    this.showModal.set(false);
-    this.campaignForm.reset();
-  }
-
+openModal() {
+  this.campaignService.openCampaign();
+}
+ closeModal() {
+  this.campaignService.closeCampaign();
+  this.campaignForm.reset();
+}
   submitCampaign() {
     if (this.campaignForm.invalid) return;
 
