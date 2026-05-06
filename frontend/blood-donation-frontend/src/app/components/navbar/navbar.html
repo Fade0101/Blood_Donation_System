@@ -27,7 +27,7 @@
       <div class="hidden md:flex items-center gap-8 text-sm">
 
         <!-- HOME -->
-        <a routerLink="/home"
+        <a *ngIf="authService.isAuthenticated()" routerLink="/home"
            class="relative flex items-center gap-2 hover:text-red-200 transition group">
 
           <i class="fa-solid fa-house"></i>
@@ -41,7 +41,7 @@
         </a>
 
         <!-- DONORS -->
-        <a routerLink="/donors"
+        <a *ngIf="authService.isAuthenticated()" routerLink="/donors"
            class="relative flex items-center gap-2 hover:text-red-200 transition group">
 
           <i class="fa-solid fa-users"></i>
@@ -55,7 +55,7 @@
         </a>
 
         <!-- CAMPAIGNS -->
-        <a routerLink="/campaigns"
+        <a *ngIf="authService.isAuthenticated()" routerLink="/campaigns"
            class="relative flex items-center gap-2 hover:text-red-200 transition group">
 
           <i class="fa-solid fa-bullhorn"></i>
@@ -68,8 +68,22 @@
 
         </a>
 
+        <!-- ADMIN DASHBOARD -->
+        <a *ngIf="authService.isAdmin()" routerLink="/admin"
+           class="relative flex items-center gap-2 hover:text-red-200 transition group">
+
+          <i class="fa-solid fa-shield"></i>
+          لوحة التحكم
+
+          <span
+            class="absolute left-0 -bottom-1 h-[2px] w-0 bg-red-300 rounded-full
+                   transition-all duration-300 group-hover:w-full">
+          </span>
+
+        </a>
+
         <!-- STATS -->
-        <a class="relative flex items-center gap-2 hover:text-red-200 transition group">
+        <a *ngIf="authService.isAuthenticated()" class="relative flex items-center gap-2 hover:text-red-200 transition group">
 
           <i class="fa-solid fa-chart-line"></i>
           الإحصائيات
@@ -86,7 +100,7 @@
       <!-- ACTIONS -->
       <div class="flex items-center gap-4">
 
-        <button
+        <button *ngIf="authService.isAuthenticated()"
           class="bg-white text-red-700 px-4 py-1.5 rounded-xl font-semibold
                  hover:bg-gray-200 transition hover:scale-105 flex items-center gap-2 shadow-md">
 
@@ -94,6 +108,32 @@
           حملة جديدة
 
         </button>
+
+        <!-- USER MENU -->
+        <div *ngIf="authService.isAuthenticated()" class="flex items-center gap-3">
+          <span class="text-sm">{{ authService.currentUser()?.email }}</span>
+          <button
+            (click)="logout()"
+            class="bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold
+                   hover:bg-red-800 transition flex items-center gap-2">
+            <i class="fa-solid fa-sign-out-alt"></i>
+            تسجيل الخروج
+          </button>
+        </div>
+
+        <!-- LOGIN/REGISTER -->
+        <div *ngIf="!authService.isAuthenticated()" class="flex items-center gap-2">
+          <a routerLink="/login"
+             class="bg-white text-red-700 px-3 py-1.5 rounded-lg text-sm font-semibold
+                    hover:bg-gray-200 transition">
+            دخول
+          </a>
+          <a routerLink="/register"
+             class="bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-semibold
+                    hover:bg-red-800 transition">
+            تسجيل
+          </a>
+        </div>
 
         <!-- MOBILE -->
         <button class="md:hidden text-xl">

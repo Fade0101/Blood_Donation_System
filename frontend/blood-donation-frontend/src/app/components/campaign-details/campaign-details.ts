@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { HttpResponse } from '@angular/common/http'; 
+import { HttpResponse } from '@angular/common/http';
 
 import { CampaignService } from '../../services/campaignService';
 import { CampaignOperationsService } from '../../services/campaign-operations';
@@ -54,16 +54,36 @@ export class CampaignDetailsComponent implements OnInit {
     });
   }
 
-  loadInitialData() {
+loadInitialData() {
     this.loading.set(true);
-    this.loadCampaign();
+    this.loadCampaign(); // جلب بيانات الحملة (الاسم، التاريخ، إلخ)
 
+    // 1. جلب "كل المتبرعين" المسجلين في السيستم (للقائمة اليسرى)
+    this.campaignService.getAllDonors().subscribe({
+      next: (res: any) => {
+        const data = res.data || res;
+        this.allDonors.set(Array.isArray(data) ? data : []);
 
-
-
-
+        // 2. استخدام الـ API الخاص بالحملة (للقائمة اليمنى - المتبرعين المشاركين)
+        this.opsService.getCampaignDonors(this.campaignId).subscribe({
+          next: (campRes: any) => {
+            // هنا بنستخدم الـ API اللي بيجيب المتبرعين بتوع الحملة دي بس
+            const campData = campRes.data || campRes;
+            this.campaignDonors.set(Array.isArray(campData) ? campData : []);
+            this.loading.set(false);
+          },
+          error: () => {
+            this.campaignDonors.set([]);
+            this.loading.set(false);
+          }
+        });
+      },
+      error: () => {
+        this.allDonors.set([]);
+        this.loading.set(false);
+      }
+    });
   }
-
   loadCampaign() {
     this.campaignService.getCampaignById(this.campaignId)
       .subscribe((res: any) => {
