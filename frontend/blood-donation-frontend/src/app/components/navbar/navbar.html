@@ -83,19 +83,54 @@
         </a>
 
       </div>
-
+<button (click)="toggleDarkMode()" class="p-2 bg-slate-800 dark:bg-white text-white dark:text-black rounded-full transition-all">
+  <i class="fa-solid fa-circle-half-stroke"></i>
+</button>
       <!-- ACTIONS -->
       <div class="flex items-center gap-4">
 
 
         <!-- MOBILE -->
-        <button class="md:hidden text-xl">
-          <i class="fa-solid fa-bars"></i>
-        </button>
+<button
+  class="md:hidden text-xl"
+  (click)="toggleMenu()"
+>
+  <i class="fa-solid fa-bars"></i>
+</button>
 
       </div>
 
     </div>
   </div>
+<!-- MOBILE MENU -->
+<div
+  *ngIf="isMenuOpen"
+  class="md:hidden bg-red-950/95 backdrop-blur-md px-6 py-4 space-y-4 text-sm"
+>
 
+  <a routerLink="/home"
+     class="flex items-center gap-2 hover:text-red-200 transition">
+    <i class="fa-solid fa-house"></i>
+    الرئيسية
+  </a>
+
+  <a routerLink="/donors"
+     class="flex items-center gap-2 hover:text-red-200 transition">
+    <i class="fa-solid fa-users"></i>
+    المتبرعين
+  </a>
+
+  <a routerLink="/campaigns"
+     class="flex items-center gap-2 hover:text-red-200 transition">
+    <i class="fa-solid fa-bullhorn"></i>
+    الحملات
+  </a>
+
+  <a routerLink="/dashboard"
+     class="flex items-center gap-2 hover:text-red-200 transition">
+    <i class="fa-solid fa-chart-line"></i>
+    الإحصائيات
+  </a>
+
+</div>
 </nav>

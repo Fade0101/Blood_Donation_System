@@ -1,10 +1,12 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { NgClass, DatePipe } from '@angular/common';
+import { NgClass, DatePipe, isPlatformBrowser } from '@angular/common';
 import { DonorsService } from '../../services/donorsService';
 import { CreateDonorRequest } from '../../interfaces/donor-interface';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import { OfflineService } from '../../services/offline';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-donor',
@@ -14,9 +16,10 @@ import Swal from 'sweetalert2';
   styleUrl: './donor.css',
 })
 export class Donor implements OnInit {
-
+private offlineService = inject(OfflineService);
   private donorService = inject(DonorsService);
   private fb = inject(FormBuilder);
+  private platformId = inject(PLATFORM_ID);
   private toastr = inject(ToastrService);
 currentPage = signal<number>(1);
   pageSize = signal<number>(10);
@@ -54,10 +57,49 @@ currentPage = signal<number>(1);
     });
   });
 
-  ngOnInit(): void {
-    this.getDonors();
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('online', () => this.syncData());
+    }
   }
 
+async ngOnInit() {
+  if (isPlatformBrowser(this.platformId)) {
+    // 1. أول حاجة اظهر البيانات اللي موجودة حالياً (سواء كاش أو سيرفر)
+    this.getDonors();
+
+    // 2. لو أونلاين، اعمل مزامنة للداتا المعلقة
+    if (navigator.onLine) {
+      await this.syncData();
+      // 3. بعد المزامنة، حدث الجدول تاني عشان تظهر البيانات الجديدة اللي اترفعت
+      this.getDonors(); 
+    }
+  }
+}
+async syncData() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    // 2. نجيب البيانات من Dexie
+    const pending = await this.offlineService.getAllPending();
+    
+    if (pending.length > 0) {
+      this.toastr.info(`جاري رفع ${pending.length} متبرع للسيرفر...`);
+
+      for (const item of pending) {
+        try {
+          // 3. نستخدم الـ donorService لرفع البيانات
+          await lastValueFrom(this.donorService.createDonor(item.data));
+          
+          // 4. لو نجح، نمسحه من الـ Dexie
+          await this.offlineService.clearPending(item.id!);
+          console.log('✅ Synced donor:', item.data.name);
+        } catch (err) {
+          console.error('❌ Sync failed for:', item.data.name, err);
+        }
+      }
+      this.toastr.success('تم مزامنة جميع البيانات المعلقة');
+    }
+  }
 getDonors() {
 
     this.donorService.getAllDonors(this.currentPage(), this.pageSize(), this.searchText(), this.selectedBloodFilter())
@@ -121,36 +163,37 @@ getDonors() {
     this.donorForm.reset();
   }
 
-  createDonor() {
-    if (this.donorForm.invalid) {
-      this.markAllTouched();
-      this.toastr.warning('من فضلك أكمل البيانات المطلوبة', 'Warning');
-      return;
-    }
+  // createDonor() {
+  //   if (this.donorForm.invalid) {
+  //     this.markAllTouched();
+  //     this.toastr.warning('من فضلك أكمل البيانات المطلوبة', 'Warning');
+  //     return;
+  //   }
 
-    const v = this.donorForm.value;
+  //   const v = this.donorForm.value;
 
-    const payload: CreateDonorRequest = {
-      nationalId: v.nationalId!,
-      name: v.name!,
-      phone: v.phone!,
-      address: v.address || '',
-    bloodType: v.bloodType ? v.bloodType : undefined,
-      church: v.church || '',
-      confessionFather: v.confessionFather || '',
-      dateOfBirth: this.formatDate(v.dateOfBirth),
-    };
+  //   const payload: CreateDonorRequest = {
+  //     nationalId: v.nationalId!,
+  //     name: v.name!,
+  //     phone: v.phone!,
+  //     address: v.address || '',
+  //   bloodType: v.bloodType ? v.bloodType : undefined,
+  //     church: v.church || '',
+  //     confessionFather: v.confessionFather || '',
+  //     dateOfBirth: this.formatDate(v.dateOfBirth),
+  //   };
 
-    this.donorService.createDonor(payload).subscribe({
-      next: (newDonor) => {
-        this.donors.update(list => [newDonor, ...list]);
-        this.toastr.success('تم إضافة المتبرع بنجاح 🎉', 'Success', { timeOut: 2000 });
-        this.closeModal();
-      },
-      error: err =>
-        this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
-    });
-  }
+  //   this.donorService.createDonor(payload).subscribe({
+  //     next: (newDonor) => {
+  //       this.donors.update(list => [newDonor, ...list]);
+  //       this.toastr.success('تم إضافة المتبرع بنجاح 🎉', 'Success', { timeOut: 2000 });
+  //       this.closeModal();
+  //     },
+  //     error: err =>
+  //       this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
+  //   });
+  // }
+  
 
   deleteDonor(id: string) {
     Swal.fire({
@@ -197,7 +240,7 @@ getDonors() {
     this.showModal = true;
   }
 
-  saveDonor() {
+saveDonor() {
     if (this.donorForm.invalid) {
       this.markAllTouched();
       this.toastr.warning('من فضلك أكمل البيانات المطلوبة', 'Warning');
@@ -211,28 +254,50 @@ getDonors() {
       name: v.name!,
       phone: v.phone!,
       address: v.address || '',
-     bloodType: v.bloodType ? v.bloodType : undefined,
+      bloodType: v.bloodType ? v.bloodType : undefined,
       church: v.church || '',
       confessionFather: v.confessionFather || '',
       dateOfBirth: this.formatDate(v.dateOfBirth),
     };
 
     if (this.isEditMode && this.selectedDonorId) {
+      // حالة التعديل (Edit)
       this.donorService.updateDonor(this.selectedDonorId, payload).subscribe({
         next: updated => {
           if (!updated) return;
-
           this.donors.update(list =>
             list.map(d => (d.id === updated.id ? updated : d))
           );
-
           this.toastr.info('تم تحديث بيانات المتبرع', 'Updated');
           this.closeModal();
         },
         error: () => this.toastr.error('فشل التحديث', 'Error')
       });
     } else {
-      this.createDonor();
+      // حالة الإضافة (Create) - بننادي الدالة اللي تحتها
+      this.createDonor(payload);
+    }
+  }
+
+  // الدالة اللي كانت ناقصة أو فيها مشكلة في الاسم
+  createDonor(payload: CreateDonorRequest) {
+    if (navigator.onLine) {
+      // لو أونلاين: ابعت للسيرفر
+      this.donorService.createDonor(payload).subscribe({
+        next: (newDonor) => {
+          this.donors.update(list => [newDonor, ...list]);
+          this.toastr.success('تم إضافة المتبرع بنجاح 🎉', 'Success');
+          this.closeModal();
+        },
+        error: err => this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
+      });
+    } else {
+      // لو أوفلاين: احفظ في IndexedDB (Dexie)
+      this.offlineService.saveStep(payload).then(() => {
+        this.toastr.info('تم الحفظ أوفلاين.. سيتم الرفع عند عودة الإنترنت', 'Offline');
+        this.donors.update(list => [payload as any, ...list]); // تحديث شكلي للقائمة
+        this.closeModal();
+      });
     }
   }
 

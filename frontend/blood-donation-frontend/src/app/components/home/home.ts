@@ -1,8 +1,8 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, viewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CampaignService } from '../../services/campaignService';
 import { ImportService } from '../../services/import';
-
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -13,12 +13,11 @@ import { ImportService } from '../../services/import';
 export class Home implements OnInit {
   private campaignService = inject(CampaignService);
   private importService = inject(ImportService);
-
-  donors = signal<any[]>([]);
+fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');  donors = signal<any[]>([]);
   campaigns = signal<any[]>([]);
   loading = signal(false);
   importLoading = signal(false);
-
+private toastr = inject(ToastrService);
   ngOnInit(): void {
     this.refreshDashboard();
   }
@@ -43,47 +42,59 @@ export class Home implements OnInit {
     });
   }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
+onFileSelected(event: any) {
+  const file: File = event.target.files[0];
 
-    if (!file) return;
-
-    this.importLoading.set(true);
-
-    this.importService.importBloodBank(file).subscribe({
-      next: (res: any) => {
-        console.log('IMPORT SUCCESS RESPONSE:', res);
-
-        this.importLoading.set(false);
-
-        if (res?.success === true) {
-          alert(
-            `تم الاستيراد بنجاح\nعدد المستورد: ${
-              res?.data?.successCount ?? 'غير معروف'
-            }`
-          );
-        } else {
-          alert('تم التنفيذ لكن بدون تأكيد نجاح واضح');
-        }
-
-        this.refreshDashboard();
-      },
-
-      error: (err) => {
-        console.error('IMPORT ERROR RESPONSE:', err);
-
-        this.importLoading.set(false);
-
-        const message =
-          err?.error?.error ||
-          err?.error?.message ||
-          err?.message ||
-          'حدث خطأ أثناء الاستيراد';
-
-        alert(`فشل الاستيراد:\n${message}`);
-      },
-    });
+  if (!file) {
+    console.log('❌ No file selected');
+    return;
   }
+
+  console.log('🚀 [UI] Blood Bank Import Started');
+  console.log('📄 File:', {
+    name: file.name,
+    size: file.size,
+    type: file.type,
+  });
+
+  this.importLoading.set(true);
+
+  this.importService.importBloodBank(file).subscribe({
+    next: (res: any) => {
+      console.log('✅ [UI] IMPORT SUCCESS');
+      console.log('📦 Full Response:', res);
+
+      console.log('📊 Inserted:', res?.data?.inserted);
+      console.log('♻️ Updated:', res?.data?.updated);
+      console.log('⏭️ Skipped:', res?.data?.skipped);
+      console.log('❌ Errors:', res?.data?.errors);
+
+      this.importLoading.set(false);
+
+      this.toastr.success(
+        `تم استيراد ${res?.data?.inserted ?? 0} متبرع بنجاح`
+      );
+
+      this.refreshDashboard();
+    },
+
+    error: (err) => {
+      console.log('❌ [UI] IMPORT FAILED');
+      console.log('🔥 Full Error Object:', err);
+      console.log('📩 Backend Error:', err?.error);
+      console.log('📩 Message:', err?.error?.message || err?.message);
+      console.log('📩 Status:', err?.status);
+
+      this.importLoading.set(false);
+
+      this.toastr.error(
+        err?.error?.message ||
+        err?.error?.error ||
+        'حدث خطأ أثناء الاستيراد'
+      );
+    },
+  });
+}
 
   totalDonors = computed(() => this.donors().length);
   totalCampaigns = computed(() => this.campaigns().length);
@@ -95,4 +106,39 @@ export class Home implements OnInit {
         new Date(d.createdAt) > new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
     ).length
   );
+  onLegacyFileSelected(event: any) {
+  const file: File = event.target.files[0];
+
+  if (!file) return;
+
+  this.importLoading.set(true);
+
+  this.importService.importLegacy(file).subscribe({
+    next: (res: any) => {
+      this.importLoading.set(false);
+
+      this.toastr.success(
+        `تم استيراد البيانات القديمة بنجاح`
+      );
+
+      console.log('LEGACY IMPORT RESPONSE:', res);
+
+      this.refreshDashboard();
+    },
+
+    error: (err) => {
+      this.importLoading.set(false);
+
+      const message =
+        err?.error?.error ||
+        err?.error?.message ||
+        err?.message ||
+        'حدث خطأ أثناء استيراد البيانات القديمة';
+
+      this.toastr.error(message);
+
+      console.error(err);
+    },
+  });
+}
 }
