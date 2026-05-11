@@ -1,29 +1,43 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { signal } from '@angular/core';
+import { CampaignService } from '../../services/campaignService';
 
 @Component({
   selector: 'app-navbar',
-  standalone: true,
   imports: [RouterLink, CommonModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
+  mobileMenuOpen = signal(false);
+  private campaignService = inject(CampaignService);
 
-  isMenuOpen = false;
+  constructor(
+    public authService: AuthService,
+    private router: Router
+  ) {}
 
-  toggleMenu() {
-    this.isMenuOpen = !this.isMenuOpen;
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen.update(value => !value);
   }
-toggleDarkMode() {
-  const hasDark = document.documentElement.classList.contains('dark');
-  if (hasDark) {
-    document.documentElement.classList.remove('dark');
-    localStorage.setItem('theme', 'light');
-  } else {
-    document.documentElement.classList.add('dark');
-    localStorage.setItem('theme', 'dark');
+
+  logout(): void {
+    this.authService.logout();
+    this.mobileMenuOpen.set(false);
+    this.router.navigate(['/login']);
+  }
+
+  addCampaign(): void {
+    this.router.navigate(['/campaigns']).then(() => {
+      this.campaignService.openCampaign();
+    });
+  }
+  toggleDarkMode():void{
+    
   }
 }
-}
+
+

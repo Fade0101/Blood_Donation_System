@@ -8,6 +8,10 @@ export const serverRoutes: ServerRoute[] = [
   },
   // ثانياً: أي مسار تاني (home, donors, etc) خليه Prerender عادي
   {
+    path: 'campaign-details/:id',
+    renderMode: RenderMode.Server
+  },
+  {
     path: '**',
     renderMode: RenderMode.Prerender
   }

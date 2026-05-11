@@ -25,9 +25,7 @@ export const appConfig: ApplicationConfig = {
 }),
 
     provideRouter(routes),
-
     provideClientHydration(withEventReplay()),
-
     provideToastr({
       timeOut: 2500,
       extendedTimeOut: 1000,
