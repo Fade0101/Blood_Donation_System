@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { Campaign } from '../interfaces/campaign';
@@ -21,7 +21,7 @@ export class CampaignService {
     this.openCampaignModal.set(false);
   }
   private http = inject(HttpClient);
-
+private donorsUrl = `${environment.baseurl}/api/donors`;
 private baseUrl = `${environment.baseurl}/api/campaigns`;  // ================= GET ALL =================
   getAllCampaigns(): Observable<Campaign[]> {
     return this.http.get<Campaign[]>(this.baseUrl);
@@ -48,8 +48,18 @@ deleteCampaign(id: string) {
     responseType: 'text' as 'json'
   });
 }
-  getAllDonors(limit: number=10000): Observable<any[]>  {
-  return this.http.get<any[]>(`${environment.baseurl}/api/donors`);
-}
+// في ملف campaignService.ts
+// في ملف src/app/services/campaignService.ts
+getAllDonors(page: number = 1, limit: number = 10, search: string = ''): Observable<any> {
+  if (search && search.trim() !== '') {
+    const params = new HttpParams().set('q', search);
+    return this.http.get<any>(`${this.donorsUrl}/search`, { params });
+  }
 
+  const params = new HttpParams()
+    .set('page', page.toString())
+    .set('limit', limit.toString());
+
+  return this.http.get<any>(this.donorsUrl, { params });
+}
 }

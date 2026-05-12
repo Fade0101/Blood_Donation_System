@@ -65,41 +65,81 @@ currentPage = signal<number>(1);
 
 async ngOnInit() {
   if (isPlatformBrowser(this.platformId)) {
-    // 1. أول حاجة اظهر البيانات اللي موجودة حالياً (سواء كاش أو سيرفر)
     this.getDonors();
 
-    // 2. لو أونلاين، اعمل مزامنة للداتا المعلقة
     if (navigator.onLine) {
-      await this.syncData();
-      // 3. بعد المزامنة، حدث الجدول تاني عشان تظهر البيانات الجديدة اللي اترفعت
-      this.getDonors(); 
+      // تأخير بسيط عشان اليوزر ما يتخضش من الرسايل أول ما يفتح
+      setTimeout(async () => {
+        await this.syncData();
+        this.getDonors(); 
+      }, 1500);
     }
   }
 }
+// async syncData() {
+//   if (!isPlatformBrowser(this.platformId)) return;
+
+//   const pending = await this.offlineService.getAllPending();
+  
+//   if (pending.length > 0) {
+//     this.toastr.info(`جاري رفع ${pending.length} متبرع للسيرفر...`);
+
+//     for (const item of pending) {
+//       try {
+//         await lastValueFrom(this.donorService.createDonor(item.data));
+//         await this.offlineService.clearPending(item.id!);
+//         console.log('✅ Synced donor:', item.data.name);
+//       } catch (err: any) {
+//         // التعديل السحري: لو السيرفر رد إن المتبرع موجود، امسحه من الـ IndexedDB كأنه نجح
+//         if (err.status === 400 && err.error?.message?.includes('already exists')) {
+//           await this.offlineService.clearPending(item.id!);
+//           console.log('ℹ️ Donor already exists on server, clearing from local:', item.data.name);
+//         } else {
+//           console.error('❌ Sync failed for:', item.data.name, err);
+//         }
+//       }
+//     }
+//     this.toastr.success('تم مزامنة البيانات بنجاح');
+//   }
+// }
 async syncData() {
-    if (!isPlatformBrowser(this.platformId)) return;
+  if (!isPlatformBrowser(this.platformId)) return;
 
-    // 2. نجيب البيانات من Dexie
-    const pending = await this.offlineService.getAllPending();
-    
-    if (pending.length > 0) {
-      this.toastr.info(`جاري رفع ${pending.length} متبرع للسيرفر...`);
+  const pending = await this.offlineService.getAllPending();
+  
+  // 1. لو مفيش داتا معلقة، اخرج فوراً من غير أي رسايل
+  if (!pending || pending.length === 0) {
+    console.log('No pending donors to sync.');
+    return; 
+  }
 
-      for (const item of pending) {
-        try {
-          // 3. نستخدم الـ donorService لرفع البيانات
-          await lastValueFrom(this.donorService.createDonor(item.data));
-          
-          // 4. لو نجح، نمسحه من الـ Dexie
-          await this.offlineService.clearPending(item.id!);
-          console.log('✅ Synced donor:', item.data.name);
-        } catch (err) {
-          console.error('❌ Sync failed for:', item.data.name, err);
-        }
+  // 2. لو فيه داتا، ابدأ اظهر الرسايل
+  this.toastr.info(`جاري رفع ${pending.length} متبرع للسيرفر...`);
+  let syncCount = 0;
+
+  for (const item of pending) {
+    try {
+      await lastValueFrom(this.donorService.createDonor(item.data));
+      await this.offlineService.clearPending(item.id!);
+      syncCount++;
+      console.log('✅ Synced donor:', item.data.name);
+    } catch (err: any) {
+      // لو المتبرع موجود فعلاً، امسحه من الأوفلاين واعتبره "تم التعامل معه"
+      if (err.status === 400 && (err.error?.message?.includes('already exists') || err.error?.error?.includes('already exists'))) {
+        await this.offlineService.clearPending(item.id!);
+        console.log('ℹ️ Donor already exists, cleared from local:', item.data.name);
+        // اختياري: ممكن ما تعتبرش دي "نجاح" كامل بس لازم تخرجها من الطابور
+      } else {
+        console.error('❌ Sync failed for:', item.data.name, err);
       }
-      this.toastr.success('تم مزامنة جميع البيانات المعلقة');
     }
   }
+
+  // 3. أظهر رسالة النجاح فقط لو فيه على الأقل واحد نجح أو الطابور خلص
+  if (syncCount > 0) {
+    this.toastr.success('تم مزامنة البيانات بنجاح');
+  }
+}
 getDonors() {
 
     this.donorService.getAllDonors(this.currentPage(), this.pageSize(), this.searchText(), this.selectedBloodFilter())
@@ -292,14 +332,21 @@ saveDonor() {
         error: err => this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
       });
     } else {
-      // لو أوفلاين: احفظ في IndexedDB (Dexie)
-      this.offlineService.saveStep(payload).then(() => {
-        this.toastr.info('تم الحفظ أوفلاين.. سيتم الرفع عند عودة الإنترنت', 'Offline');
-        this.donors.update(list => [payload as any, ...list]); // تحديث شكلي للقائمة
-        this.closeModal();
-      });
-    }
+    // التعديل هنا: اتأكد إن الـ payload فيه داتا فعلاً قبل ما تبعته
+    console.log('Saving to offline storage:', payload); 
+    
+    // تأكد إنك بتبعت الـ payload كامل
+    this.offlineService.saveStep({...payload}).then(() => {
+      this.toastr.info('تم الحفظ أوفلاين');
+      
+      // تحديث اللستة في الصفحة الحالية عشان تحس بالتغيير
+      this.donors.update(list => [payload as any, ...list]);
+      this.closeModal();
+    }).catch(err => {
+      console.error('Dexie Error:', err);
+    });
   }
+}
 
   private formatDate(date: any): string | undefined {
     if (!date) return undefined;

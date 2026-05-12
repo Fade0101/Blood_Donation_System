@@ -8,33 +8,40 @@
       "resources": {
         "files": [
           "/index.html",
+          "/manifest.webmanifest",
           "/*.css",
           "/*.js",
-          "/manifest.webmanifest",
-          "/*.ico",
-          "/*.jpg",
-          "/*.png",
-          "/*.svg"
+          "/favicon.ico"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|apple-touch-icon|otf|ttf|woff|woff2)",
+          "/assets/**" 
         ]
       }
     }
   ],
   "dataGroups": [
     {
-      "name": "api-data",
-      "urls": [
-        "http://localhost:5000/api/**",
-        "/api/**"
-      ],
+      "name": "api-calls",
+      "urls": ["/api/**", "!/api/auth/**"],
       "cacheConfig": {
+        "strategy": "freshness",
         "maxSize": 100,
-        "maxAge": "1h",
-        "timeout": "5s",
-        "strategy": "freshness"
+        "maxAge": "1d",
+        "timeout": "5s"
       }
     }
   ],
   "navigationUrls": [
-    "/**"
+    "/**",
+    "!/**/*.*",
+    "!/**/*__*"
   ]
 }

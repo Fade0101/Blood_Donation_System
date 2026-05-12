@@ -24,10 +24,32 @@ export interface AuthResponse {
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
 
-  private currentUserSignal = signal<User | null>(null);
-  private tokenSignal = signal<string | null>(null);
+  // 1. استخراج البيانات من localStorage فوراً قبل تعريف الـ Signals
+  private getInitialToken(): string | null {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
+  }
+
+  private getInitialUser(): User | null {
+    if (typeof localStorage !== 'undefined') {
+      const userJson = localStorage.getItem('user');
+      try {
+        return userJson ? JSON.parse(userJson) : null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  // 2. تعريف الـ Signals بقيم ابتدائية حقيقية (عشان الـ Refresh ما يرميش على الـ Login)
+  private currentUserSignal = signal<User | null>(this.getInitialUser());
+  private tokenSignal = signal<string | null>(this.getInitialToken());
   private isLoadingSignal = signal(false);
 
+  // 3. الـ Readonly والمشتقات (Computed)
   currentUser = this.currentUserSignal.asReadonly();
   token = this.tokenSignal.asReadonly();
   isLoading = this.isLoadingSignal.asReadonly();
@@ -35,7 +57,7 @@ export class AuthService {
   isAdmin = computed(() => this.currentUserSignal()?.role === 'ADMIN');
 
   constructor(private http: HttpClient) {
-    this.loadFromLocalStorage();
+    // الـ Constructor هنا بقى "رايق" لأن البيانات اتسحبت فوق خلاص
   }
 
   register(email: string, password: string): Observable<AuthResponse> {
@@ -70,48 +92,17 @@ export class AuthService {
     this.saveToLocalStorage(token, user);
   }
 
-  private loadFromLocalStorage(): void {
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
-
-      if (token && user) {
-        this.tokenSignal.set(token);
-        this.currentUserSignal.set(JSON.parse(user));
-      }
-    } catch (error) {
-      console.error('Failed to load auth data from localStorage', error);
-      this.logout();
-    }
-  }
-
   private saveToLocalStorage(token: string, user: User): void {
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      return;
-    }
-
-    try {
+    if (typeof localStorage !== 'undefined') {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-    } catch (error) {
-      console.error('Failed to save auth data to localStorage', error);
     }
   }
 
   private removeFromLocalStorage(): void {
-    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-      return;
-    }
-
-    try {
+    if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-    } catch (error) {
-      console.error('Failed to remove auth data from localStorage', error);
     }
   }
 }

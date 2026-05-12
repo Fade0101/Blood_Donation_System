@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withHashLocation } from '@angular/router';
 import { provideToastr } from 'ngx-toastr';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
@@ -14,19 +14,19 @@ Chart.register(...registerables);
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
-    // ✅ HttpClient مرة واحدة بس
+    provideRouter(routes,withHashLocation()),
     provideHttpClient(
       withFetch(),
-      withInterceptors([errorInterceptor,offlineInterceptor])
-    ),provideServiceWorker('ngsw-worker.js', {
-  enabled: true, // خليها true إجبارياً للتجربة
-  registrationStrategy: 'registerImmediately' // خليه يسجل فوراً أول ما الموقع يفتح
-}),
-
-    provideRouter(routes),
+      withInterceptors([errorInterceptor, offlineInterceptor])
+    ),
+    // 1. انقل الـ Service Worker هنا وخلي الاستراتيجية دي:
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: true, 
+      registrationStrategy: 'registerWhenStable:3000' // استنى 3 ثواني الاستقرار وبعدين سجل
+    }),
+    // 2. الـ Hydration يفضل في الآخر
     provideClientHydration(withEventReplay()),
-    provideToastr({
+provideToastr({
       timeOut: 2500,
       extendedTimeOut: 1000,
       progressBar: true,
@@ -38,5 +38,6 @@ export const appConfig: ApplicationConfig = {
       tapToDismiss: true,
       easeTime: 300
     })
+    ,    provideBrowserGlobalErrorListeners(),
   ]
 };

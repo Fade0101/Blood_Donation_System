@@ -1,13 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+/* Tailwind الأساسي */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @import 'tailwindcss';
-@import 'ngx-toastr/toastr';
 
+/* استيراد Toastr - اختار نسخة واحدة بس عشان التكرار غلط */
+@import "ngx-toastr/toastr"; 
 
-@import 'ngx-toastr/toastr-bs4-alert';
+/* أي تنسيقات خاصة بك ضيفها هنا باستخدام CSS عادي */
 
-@import 'ngx-toastr/toastr-bs4-alert';
-@import 'ngx-toastr/toastr-bs5-alert';
-
+/* تأكد إنك لو عندك تعليقات تكون بالشكل ده */
+/* My Custom Styles */
