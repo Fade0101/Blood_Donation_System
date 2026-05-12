@@ -9,6 +9,7 @@ import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 // 🔥 Chart.js setup
 import { Chart, registerables } from 'chart.js';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { offlineInterceptor } from './core/interceptors/offline-interceptor';
 Chart.register(...registerables);
 
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes,withHashLocation()),
     provideHttpClient(
       withFetch(),
-      withInterceptors([errorInterceptor, offlineInterceptor])
+      withInterceptors([authInterceptor, errorInterceptor, offlineInterceptor])
     ),
     // 1. انقل الـ Service Worker هنا وخلي الاستراتيجية دي:
     provideServiceWorker('ngsw-worker.js', {

@@ -158,6 +158,47 @@
             </div>
           </div>
 
+          <!-- Gender Filter -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-blue-100">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold text-blue-700 flex items-center gap-2">
+                <i class="fa-solid fa-venus-mars"></i> فلترة حسب النوع
+              </h3>
+              <button
+                (click)="filterByGender('ALL')"
+                class="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
+                عرض الكل
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <button
+                class="px-4 py-2 rounded-full border text-sm font-bold transition-all duration-300"
+                [class.bg-blue-600]="selectedGenderFilter() === 'MALE'"
+                [class.text-white]="selectedGenderFilter() === 'MALE'"
+                [class.border-blue-600]="selectedGenderFilter() === 'MALE'"
+                [class.bg-white]="selectedGenderFilter() !== 'MALE'"
+                [class.text-blue-600]="selectedGenderFilter() !== 'MALE'"
+                [class.border-blue-200]="selectedGenderFilter() !== 'MALE'"
+                (click)="filterByGender('MALE')"
+              >
+                <i class="fa-solid fa-mars"></i> ذكر
+              </button>
+              <button
+                class="px-4 py-2 rounded-full border text-sm font-bold transition-all duration-300"
+                [class.bg-pink-600]="selectedGenderFilter() === 'FEMALE'"
+                [class.text-white]="selectedGenderFilter() === 'FEMALE'"
+                [class.border-pink-600]="selectedGenderFilter() === 'FEMALE'"
+                [class.bg-white]="selectedGenderFilter() !== 'FEMALE'"
+                [class.text-pink-600]="selectedGenderFilter() !== 'FEMALE'"
+                [class.border-pink-200]="selectedGenderFilter() !== 'FEMALE'"
+                (click)="filterByGender('FEMALE')"
+              >
+                <i class="fa-solid fa-venus"></i> أنثى
+              </button>
+            </div>
+          </div>
+
         </div>
         <!-- RIGHT IMAGE CARD -->
         <div class="bg-white rounded-3xl shadow-xl border border-red-100 overflow-hidden relative">
@@ -249,6 +290,7 @@
                 <th class="p-5 whitespace-nowrap">رقم الهاتف</th>
                 <th class="p-5 whitespace-nowrap">الرقم القومي</th>
                 <th class="p-5 whitespace-nowrap">فصيلة الدم</th>
+                <th class="p-5 whitespace-nowrap">النوع</th>
                 <th class="p-5 whitespace-nowrap">تاريخ الميلاد</th>
                 <th class="p-5 whitespace-nowrap">العنوان</th>
                 <th class="p-5 text-center whitespace-nowrap">الإجراءات</th>
@@ -268,6 +310,16 @@
                     <span class="blood-pill" [ngClass]="getBloodClass(d.bloodType)">
                       {{ d.bloodType }}
                     </span>
+                  </td>
+                  <!-- GENDER -->
+                  <td class="p-5">
+                    @if (d.gender === 'MALE') {
+                      <span class="text-blue-600 bg-blue-50 px-3 py-1 rounded-full text-xs font-medium"><i class="fa-solid fa-mars"></i> ذكر</span>
+                    } @else if (d.gender === 'FEMALE') {
+                      <span class="text-pink-600 bg-pink-50 px-3 py-1 rounded-full text-xs font-medium"><i class="fa-solid fa-venus"></i> أنثى</span>
+                    } @else {
+                      <span class="text-gray-400">-</span>
+                    }
                   </td>
                   <!-- DOB -->
                   <td class="p-5 text-gray-600">
@@ -401,6 +453,15 @@
             <option value="AB_NEG">AB-</option>
             <option value="O_POS">O+</option>
             <option value="O_NEG">O-</option>
+          </select>
+        </div>
+        <!-- GENDER -->
+        <div>
+          <label class="label">النوع</label>
+          <select formControlName="gender" class="input">
+            <option value="">غير محدد</option>
+            <option value="MALE">ذكر</option>
+            <option value="FEMALE">أنثى</option>
           </select>
         </div>
         <!-- DATE -->

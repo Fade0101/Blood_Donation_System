@@ -55,6 +55,8 @@ export const syncOfflineData = async (campaignId: string, donorsArray: any[]) =>
             phone: currentDonor.phone,
             address: currentDonor.address,
             dateOfBirth: currentDonor.dateOfBirth ? new Date(currentDonor.dateOfBirth) : null,
+            bloodType: currentDonor.bloodType,
+            gender: currentDonor.gender,
           },
           create: {
             nationalId: currentDonor.nationalId,
@@ -62,6 +64,8 @@ export const syncOfflineData = async (campaignId: string, donorsArray: any[]) =>
             phone: currentDonor.phone,
             address: currentDonor.address,
             dateOfBirth: currentDonor.dateOfBirth ? new Date(currentDonor.dateOfBirth) : null,
+            bloodType: currentDonor.bloodType,
+            gender: currentDonor.gender,
           },
         });
 

@@ -8,7 +8,7 @@ export const donorRepository = {
       _count: { bloodType: true },
     });
   },
-findAll(skip: number = 0, take: number = 10, search?: string, bloodType?: string) {
+  findAll(skip: number = 0, take: number = 10, search?: string, bloodType?: string, gender?: string) {
    
     const whereCondition: any = {};
     
@@ -16,12 +16,16 @@ findAll(skip: number = 0, take: number = 10, search?: string, bloodType?: string
       whereCondition.OR = [
         { name: { contains: search, mode: "insensitive" } },
         { phone: { contains: search, mode: "insensitive" } },
-        { nationalId: { contains: search, mode: "insensitive" } } // ضفنا الرقم القومي كهدية للـ UX
+        { nationalId: { contains: search, mode: "insensitive" } }
       ];
     }
     
     if (bloodType && bloodType !== 'ALL') {
       whereCondition.bloodType = bloodType;
+    }
+    
+    if (gender && gender !== 'ALL') {
+      whereCondition.gender = gender;
     }
 
     return prisma.$transaction([

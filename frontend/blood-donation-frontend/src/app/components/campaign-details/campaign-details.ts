@@ -32,6 +32,7 @@ export class CampaignDetailsComponent implements OnInit {
   searchTerm = signal('');
   campaignId!: string;
   submittingIds = signal<Set<string>>(new Set());
+  genderFilter = signal<string>('ALL');
 
   // --- Pagination Signals ---
   currentPage = signal(1);
@@ -49,6 +50,20 @@ export class CampaignDetailsComponent implements OnInit {
     this.submittingIds().forEach(id => ids.add(id.toString()));
     return ids;
   });
+
+  maleCount = computed(() => this.campaignDonors().filter((d: any) => d.gender === 'MALE').length);
+  femaleCount = computed(() => this.campaignDonors().filter((d: any) => d.gender === 'FEMALE').length);
+
+  filteredCampaignDonors = computed(() => {
+    const filter = this.genderFilter();
+    const donors = this.campaignDonors();
+    if (filter === 'ALL') return donors;
+    return donors.filter(d => d.gender === filter);
+  });
+
+  setGenderFilter(filter: string) {
+    this.genderFilter.set(filter);
+  }
 
   // --- Initialization ---
   ngOnInit(): void {
@@ -71,7 +86,7 @@ export class CampaignDetailsComponent implements OnInit {
   loadData() {
     this.loading.set(true);
     this.loadCampaign();
-    this.loadAllDonors(); // استدعاء دالة التحميل المطورة
+    this.loadAllDonors();
     this.loadCampaignDonors();
   }
 
@@ -81,29 +96,24 @@ export class CampaignDetailsComponent implements OnInit {
       this.campaign.set(res?.data || res);
     });
   }
-// ضيف ده تحت الـ Signals في ملف الـ .ts
-filteredDonors = computed(() => {
-  const term = this.searchTerm().toLowerCase();
-  // لو السيرفر بعت الداتا، وإحنا لسه عايزين نفلترها في الـ UI احتياطاً
-  return this.allDonors().filter(d =>
-    d.name?.toLowerCase().includes(term) ||
-    d.nationalId?.toString().includes(term) ||
-    d.phone?.includes(term)
-  );
-});
+  filteredDonors = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    return this.allDonors().filter(d =>
+      d.name?.toLowerCase().includes(term) ||
+      d.nationalId?.toString().includes(term) ||
+      d.phone?.includes(term)
+    );
+  });
   async loadAllDonors() {
-    // 1. جلب بيانات الأوفلاين (التي لم ترفع بعد)
     let offlineList: any[] = [];
     if (isPlatformBrowser(this.platformId)) {
       offlineList = await this.offlineService.getAllPendingDonors();
     }
 
-    // 2. طلب السيرفر مع البارامترات (Pagination + Search)
     this.campaignService.getAllDonors(this.currentPage(), this.pageSize(), this.searchTerm()).subscribe({
       next: (res: any) => {
-        // فك تشفير الـ Response (دعم كائن السيرفر أو المصفوفة المباشرة)
         const serverList = res?.data || (Array.isArray(res) ? res : []);
-        
+
         if (res?.meta) {
           this.totalPages.set(res.meta.totalPages || 1);
           this.totalDonorsCount.set(res.meta.total || 0);
@@ -111,7 +121,6 @@ filteredDonors = computed(() => {
 
         let merged = [...serverList];
 
-        // دمج الأوفلاين في الصفحة الأولى فقط لتجنب التكرار
         if (this.currentPage() === 1) {
           offlineList.forEach((off: any) => {
             const exists = merged.some(s => s.nationalId?.toString() === off.nationalId?.toString());
@@ -139,7 +148,7 @@ filteredDonors = computed(() => {
   // --- Pagination & Search Actions ---
   onSearch(event: any) {
     this.searchTerm.set(event.target.value ?? '');
-    this.currentPage.set(1); // العودة للصفحة الأولى عند البحث
+    this.currentPage.set(1);
     this.loadAllDonors();
   }
 
@@ -169,6 +178,8 @@ filteredDonors = computed(() => {
       name: donor.name,
       phone: donor.phone,
       address: donor.address || '',
+      bloodType: donor.bloodType || undefined,
+      gender: donor.gender || undefined,
       offlineSyncId: this.generateId()
     };
 
@@ -238,7 +249,11 @@ filteredDonors = computed(() => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `campaign_export.csv`;
+
+
+      const campaignNum = this.campaign()?.campaignNumber || this.campaignId;
+      a.download = `campaign_${campaignNum}_donors.csv`;
+
       a.click();
       window.URL.revokeObjectURL(url);
     });

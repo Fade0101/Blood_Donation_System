@@ -6,6 +6,7 @@ export interface Donor {
   address: string;
   dateOfBirth: string;
   bloodType: string;
+  gender?: string;
   church?: string;
   
   confessionFather?: string;
@@ -17,6 +18,7 @@ export interface CreateDonorRequest {
   address?: string;
   dateOfBirth?: string;
   bloodType?: string;
+  gender?: string;
   church?: string;
   confessionFather?: string;
 }

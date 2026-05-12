@@ -12,10 +12,11 @@ export class DonorsService {
   private http = inject(HttpClient);
 
   private baseUrl = `${environment.baseurl}/api/donors`;
-getAllDonors(page: number = 1, limit: number = 10, search: string = '', bloodType: string = 'ALL', includeStats: boolean = true) {
+  getAllDonors(page: number = 1, limit: number = 10, search: string = '', bloodType: string = 'ALL', gender: string = 'ALL', includeStats: boolean = true) {
     let url = `${this.baseUrl}?page=${page}&limit=${limit}&includeStats=${includeStats}`;
     if (search) url += `&search=${search}`;
     if (bloodType !== 'ALL') url += `&bloodType=${bloodType}`;
+    if (gender !== 'ALL') url += `&gender=${gender}`;
 
     return this.http.get(url);
   }
