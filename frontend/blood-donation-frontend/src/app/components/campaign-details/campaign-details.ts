@@ -238,7 +238,7 @@ filteredDonors = computed(() => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `campaign_export.csv`;
+a.download = `campaign_${this.campaignId}_donors.csv`;
       a.click();
       window.URL.revokeObjectURL(url);
     });
