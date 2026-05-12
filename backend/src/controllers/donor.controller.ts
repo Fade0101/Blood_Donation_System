@@ -7,8 +7,9 @@ export const donorController = {
     const limit = parseInt(req.query.limit as string) || 10;
     const search = req.query.search as string;
     const bloodType = req.query.bloodType as string;
-const includeStats = req.query.includeStats === 'true';
-const result = await donorService.getAllDonors(page, limit, search, bloodType, includeStats);
+    const gender = req.query.gender as string;
+    const includeStats = req.query.includeStats === 'true';
+    const result = await donorService.getAllDonors(page, limit, search, bloodType, gender, includeStats);
 
     res.json({ success: true, data: result.data, meta: result.meta ,stats: result.stats});
   },

@@ -34,6 +34,7 @@ export interface RegisterDonorRequest {
   phone?: string;
   address?: string;
   dateOfBirth?: string;
+  gender?: string;
   offlineSyncId?: string;
 }
 
@@ -50,6 +51,7 @@ export interface Donor {
   address?: string;
   dateOfBirth?: string;
   bloodType?: string | null;
+  gender?: string | null;
   createdAt: string;
   updatedAt: string;
 }

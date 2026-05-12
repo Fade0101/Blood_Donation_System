@@ -21,11 +21,11 @@ function withAge(donor: Donor): DonorWithAge {
 
 export const donorService = {
   
-async getAllDonors(page: number = 1, limit: number = 20, search?: string, bloodType?: string,includeStats: boolean =false) {
+async getAllDonors(page: number = 1, limit: number = 20, search?: string, bloodType?: string, gender?: string, includeStats: boolean = false) {
     const skip = (page - 1) * limit;
     
    
-    const [donors, total] = await donorRepository.findAll(skip, limit, search, bloodType);    
+    const [donors, total] = await donorRepository.findAll(skip, limit, search, bloodType, gender);    
     const donorsWithAge = donors.map((donor) => withAge(donor));
     let stats = null ; 
     if(includeStats) {

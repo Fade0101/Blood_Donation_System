@@ -28,6 +28,7 @@ currentPage = signal<number>(1);
   donors = signal<any[]>([]);
   searchText = signal<string>('');
   selectedBloodFilter = signal<string>('ALL');
+  selectedGenderFilter = signal<string>('ALL');
   bloodStats = signal<any>({});
 
   donorForm = this.fb.group({
@@ -37,6 +38,7 @@ currentPage = signal<number>(1);
     address: [''],
     dateOfBirth: [null],
     bloodType: [''],
+    gender: [''],
     church: [''],
     confessionFather: [''],
   });
@@ -49,11 +51,13 @@ currentPage = signal<number>(1);
     const list = this.donors();
     const search = this.searchText().toLowerCase();
     const blood = this.selectedBloodFilter();
+    const gender = this.selectedGenderFilter();
 
     return list.filter(d => {
       const matchesBlood = blood === 'ALL' || d.bloodType === blood;
+      const matchesGender = gender === 'ALL' || d.gender === gender;
       const matchesSearch = !search || d.name.toLowerCase().includes(search);
-      return matchesBlood && matchesSearch;
+      return matchesBlood && matchesGender && matchesSearch;
     });
   });
 
@@ -68,7 +72,6 @@ async ngOnInit() {
     this.getDonors();
 
     if (navigator.onLine) {
-      // تأخير بسيط عشان اليوزر ما يتخضش من الرسايل أول ما يفتح
       setTimeout(async () => {
         await this.syncData();
         this.getDonors(); 
@@ -76,44 +79,17 @@ async ngOnInit() {
     }
   }
 }
-// async syncData() {
-//   if (!isPlatformBrowser(this.platformId)) return;
 
-//   const pending = await this.offlineService.getAllPending();
-  
-//   if (pending.length > 0) {
-//     this.toastr.info(`جاري رفع ${pending.length} متبرع للسيرفر...`);
-
-//     for (const item of pending) {
-//       try {
-//         await lastValueFrom(this.donorService.createDonor(item.data));
-//         await this.offlineService.clearPending(item.id!);
-//         console.log('✅ Synced donor:', item.data.name);
-//       } catch (err: any) {
-//         // التعديل السحري: لو السيرفر رد إن المتبرع موجود، امسحه من الـ IndexedDB كأنه نجح
-//         if (err.status === 400 && err.error?.message?.includes('already exists')) {
-//           await this.offlineService.clearPending(item.id!);
-//           console.log('ℹ️ Donor already exists on server, clearing from local:', item.data.name);
-//         } else {
-//           console.error('❌ Sync failed for:', item.data.name, err);
-//         }
-//       }
-//     }
-//     this.toastr.success('تم مزامنة البيانات بنجاح');
-//   }
-// }
 async syncData() {
   if (!isPlatformBrowser(this.platformId)) return;
 
   const pending = await this.offlineService.getAllPending();
   
-  // 1. لو مفيش داتا معلقة، اخرج فوراً من غير أي رسايل
   if (!pending || pending.length === 0) {
     console.log('No pending donors to sync.');
     return; 
   }
 
-  // 2. لو فيه داتا، ابدأ اظهر الرسايل
   this.toastr.info(`جاري رفع ${pending.length} متبرع للسيرفر...`);
   let syncCount = 0;
 
@@ -124,11 +100,9 @@ async syncData() {
       syncCount++;
       console.log('✅ Synced donor:', item.data.name);
     } catch (err: any) {
-      // لو المتبرع موجود فعلاً، امسحه من الأوفلاين واعتبره "تم التعامل معه"
       if (err.status === 400 && (err.error?.message?.includes('already exists') || err.error?.error?.includes('already exists'))) {
         await this.offlineService.clearPending(item.id!);
         console.log('ℹ️ Donor already exists, cleared from local:', item.data.name);
-        // اختياري: ممكن ما تعتبرش دي "نجاح" كامل بس لازم تخرجها من الطابور
       } else {
         console.error('❌ Sync failed for:', item.data.name, err);
       }
@@ -142,7 +116,7 @@ async syncData() {
 }
 getDonors() {
 
-    this.donorService.getAllDonors(this.currentPage(), this.pageSize(), this.searchText(), this.selectedBloodFilter())
+    this.donorService.getAllDonors(this.currentPage(), this.pageSize(), this.searchText(), this.selectedBloodFilter(), this.selectedGenderFilter())
       .subscribe({
         next: (res: any) => {
           const donorsArray = res?.data || [];
@@ -168,6 +142,12 @@ getDonors() {
 
   filterByBlood(type: string) {
     this.selectedBloodFilter.set(type);
+    this.currentPage.set(1);
+    this.getDonors();
+  }
+
+  filterByGender(type: string) {
+    this.selectedGenderFilter.set(type);
     this.currentPage.set(1);
     this.getDonors();
   }
@@ -273,6 +253,7 @@ getDonors() {
       address: donor.address,
       dateOfBirth: donor.dateOfBirth ? donor.dateOfBirth.split('T')[0] : null,
       bloodType: donor.bloodType,
+      gender: donor.gender,
       church: donor.church,
       confessionFather: donor.confessionFather,
     });
@@ -295,6 +276,7 @@ saveDonor() {
       phone: v.phone!,
       address: v.address || '',
       bloodType: v.bloodType ? v.bloodType : undefined,
+      gender: v.gender ? v.gender : undefined,
       church: v.church || '',
       confessionFather: v.confessionFather || '',
       dateOfBirth: this.formatDate(v.dateOfBirth),
