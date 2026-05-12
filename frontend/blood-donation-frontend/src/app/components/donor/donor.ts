@@ -1,10 +1,12 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { NgClass, DatePipe } from '@angular/common';
+import { NgClass, DatePipe, isPlatformBrowser } from '@angular/common';
 import { DonorsService } from '../../services/donorsService';
 import { CreateDonorRequest } from '../../interfaces/donor-interface';
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
+import { OfflineService } from '../../services/offline';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-donor',
@@ -14,9 +16,10 @@ import Swal from 'sweetalert2';
   styleUrl: './donor.css',
 })
 export class Donor implements OnInit {
-
+private offlineService = inject(OfflineService);
   private donorService = inject(DonorsService);
   private fb = inject(FormBuilder);
+  private platformId = inject(PLATFORM_ID);
   private toastr = inject(ToastrService);
 currentPage = signal<number>(1);
   pageSize = signal<number>(10);
@@ -54,10 +57,89 @@ currentPage = signal<number>(1);
     });
   });
 
-  ngOnInit(): void {
-    this.getDonors();
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      window.addEventListener('online', () => this.syncData());
+    }
   }
 
+async ngOnInit() {
+  if (isPlatformBrowser(this.platformId)) {
+    this.getDonors();
+
+    if (navigator.onLine) {
+      // تأخير بسيط عشان اليوزر ما يتخضش من الرسايل أول ما يفتح
+      setTimeout(async () => {
+        await this.syncData();
+        this.getDonors(); 
+      }, 1500);
+    }
+  }
+}
+// async syncData() {
+//   if (!isPlatformBrowser(this.platformId)) return;
+
+//   const pending = await this.offlineService.getAllPending();
+  
+//   if (pending.length > 0) {
+//     this.toastr.info(`جاري رفع ${pending.length} متبرع للسيرفر...`);
+
+//     for (const item of pending) {
+//       try {
+//         await lastValueFrom(this.donorService.createDonor(item.data));
+//         await this.offlineService.clearPending(item.id!);
+//         console.log('✅ Synced donor:', item.data.name);
+//       } catch (err: any) {
+//         // التعديل السحري: لو السيرفر رد إن المتبرع موجود، امسحه من الـ IndexedDB كأنه نجح
+//         if (err.status === 400 && err.error?.message?.includes('already exists')) {
+//           await this.offlineService.clearPending(item.id!);
+//           console.log('ℹ️ Donor already exists on server, clearing from local:', item.data.name);
+//         } else {
+//           console.error('❌ Sync failed for:', item.data.name, err);
+//         }
+//       }
+//     }
+//     this.toastr.success('تم مزامنة البيانات بنجاح');
+//   }
+// }
+async syncData() {
+  if (!isPlatformBrowser(this.platformId)) return;
+
+  const pending = await this.offlineService.getAllPending();
+  
+  // 1. لو مفيش داتا معلقة، اخرج فوراً من غير أي رسايل
+  if (!pending || pending.length === 0) {
+    console.log('No pending donors to sync.');
+    return; 
+  }
+
+  // 2. لو فيه داتا، ابدأ اظهر الرسايل
+  this.toastr.info(`جاري رفع ${pending.length} متبرع للسيرفر...`);
+  let syncCount = 0;
+
+  for (const item of pending) {
+    try {
+      await lastValueFrom(this.donorService.createDonor(item.data));
+      await this.offlineService.clearPending(item.id!);
+      syncCount++;
+      console.log('✅ Synced donor:', item.data.name);
+    } catch (err: any) {
+      // لو المتبرع موجود فعلاً، امسحه من الأوفلاين واعتبره "تم التعامل معه"
+      if (err.status === 400 && (err.error?.message?.includes('already exists') || err.error?.error?.includes('already exists'))) {
+        await this.offlineService.clearPending(item.id!);
+        console.log('ℹ️ Donor already exists, cleared from local:', item.data.name);
+        // اختياري: ممكن ما تعتبرش دي "نجاح" كامل بس لازم تخرجها من الطابور
+      } else {
+        console.error('❌ Sync failed for:', item.data.name, err);
+      }
+    }
+  }
+
+  // 3. أظهر رسالة النجاح فقط لو فيه على الأقل واحد نجح أو الطابور خلص
+  if (syncCount > 0) {
+    this.toastr.success('تم مزامنة البيانات بنجاح');
+  }
+}
 getDonors() {
 
     this.donorService.getAllDonors(this.currentPage(), this.pageSize(), this.searchText(), this.selectedBloodFilter())
@@ -121,36 +203,37 @@ getDonors() {
     this.donorForm.reset();
   }
 
-  createDonor() {
-    if (this.donorForm.invalid) {
-      this.markAllTouched();
-      this.toastr.warning('من فضلك أكمل البيانات المطلوبة', 'Warning');
-      return;
-    }
+  // createDonor() {
+  //   if (this.donorForm.invalid) {
+  //     this.markAllTouched();
+  //     this.toastr.warning('من فضلك أكمل البيانات المطلوبة', 'Warning');
+  //     return;
+  //   }
 
-    const v = this.donorForm.value;
+  //   const v = this.donorForm.value;
 
-    const payload: CreateDonorRequest = {
-      nationalId: v.nationalId!,
-      name: v.name!,
-      phone: v.phone!,
-      address: v.address || '',
-    bloodType: v.bloodType ? v.bloodType : undefined,
-      church: v.church || '',
-      confessionFather: v.confessionFather || '',
-      dateOfBirth: this.formatDate(v.dateOfBirth),
-    };
+  //   const payload: CreateDonorRequest = {
+  //     nationalId: v.nationalId!,
+  //     name: v.name!,
+  //     phone: v.phone!,
+  //     address: v.address || '',
+  //   bloodType: v.bloodType ? v.bloodType : undefined,
+  //     church: v.church || '',
+  //     confessionFather: v.confessionFather || '',
+  //     dateOfBirth: this.formatDate(v.dateOfBirth),
+  //   };
 
-    this.donorService.createDonor(payload).subscribe({
-      next: (newDonor) => {
-        this.donors.update(list => [newDonor, ...list]);
-        this.toastr.success('تم إضافة المتبرع بنجاح 🎉', 'Success', { timeOut: 2000 });
-        this.closeModal();
-      },
-      error: err =>
-        this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
-    });
-  }
+  //   this.donorService.createDonor(payload).subscribe({
+  //     next: (newDonor) => {
+  //       this.donors.update(list => [newDonor, ...list]);
+  //       this.toastr.success('تم إضافة المتبرع بنجاح 🎉', 'Success', { timeOut: 2000 });
+  //       this.closeModal();
+  //     },
+  //     error: err =>
+  //       this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
+  //   });
+  // }
+  
 
   deleteDonor(id: string) {
     Swal.fire({
@@ -197,7 +280,7 @@ getDonors() {
     this.showModal = true;
   }
 
-  saveDonor() {
+saveDonor() {
     if (this.donorForm.invalid) {
       this.markAllTouched();
       this.toastr.warning('من فضلك أكمل البيانات المطلوبة', 'Warning');
@@ -211,30 +294,59 @@ getDonors() {
       name: v.name!,
       phone: v.phone!,
       address: v.address || '',
-     bloodType: v.bloodType ? v.bloodType : undefined,
+      bloodType: v.bloodType ? v.bloodType : undefined,
       church: v.church || '',
       confessionFather: v.confessionFather || '',
       dateOfBirth: this.formatDate(v.dateOfBirth),
     };
 
     if (this.isEditMode && this.selectedDonorId) {
+      // حالة التعديل (Edit)
       this.donorService.updateDonor(this.selectedDonorId, payload).subscribe({
         next: updated => {
           if (!updated) return;
-
           this.donors.update(list =>
             list.map(d => (d.id === updated.id ? updated : d))
           );
-
           this.toastr.info('تم تحديث بيانات المتبرع', 'Updated');
           this.closeModal();
         },
         error: () => this.toastr.error('فشل التحديث', 'Error')
       });
     } else {
-      this.createDonor();
+      // حالة الإضافة (Create) - بننادي الدالة اللي تحتها
+      this.createDonor(payload);
     }
   }
+
+  // الدالة اللي كانت ناقصة أو فيها مشكلة في الاسم
+  createDonor(payload: CreateDonorRequest) {
+    if (navigator.onLine) {
+      // لو أونلاين: ابعت للسيرفر
+      this.donorService.createDonor(payload).subscribe({
+        next: (newDonor) => {
+          this.donors.update(list => [newDonor, ...list]);
+          this.toastr.success('تم إضافة المتبرع بنجاح 🎉', 'Success');
+          this.closeModal();
+        },
+        error: err => this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
+      });
+    } else {
+    // التعديل هنا: اتأكد إن الـ payload فيه داتا فعلاً قبل ما تبعته
+    console.log('Saving to offline storage:', payload); 
+    
+    // تأكد إنك بتبعت الـ payload كامل
+    this.offlineService.saveStep({...payload}).then(() => {
+      this.toastr.info('تم الحفظ أوفلاين');
+      
+      // تحديث اللستة في الصفحة الحالية عشان تحس بالتغيير
+      this.donors.update(list => [payload as any, ...list]);
+      this.closeModal();
+    }).catch(err => {
+      console.error('Dexie Error:', err);
+    });
+  }
+}
 
   private formatDate(date: any): string | undefined {
     if (!date) return undefined;

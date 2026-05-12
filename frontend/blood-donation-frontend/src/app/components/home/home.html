@@ -27,13 +27,40 @@
             <i class="fa-solid fa-plus"></i>
             حملة جديدة
           </button>
-          <button 
-  class="hover:bg-white/10 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2"
+ <button
+  class="hover:bg-white/10 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 disabled:opacity-50"
   (click)="fileInput.click()"
+  [disabled]="importLoading()"
 >
   <i class="fa-solid fa-file-import text-slate-400"></i>
-  استيراد CSV
+
+  @if (!importLoading()) {
+    <span>استيراد CSV</span>
+  } @else {
+    <span>جاري الاستيراد...</span>
+  }
 </button>
+<button
+  class="hover:bg-white/10 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 disabled:opacity-50"
+  (click)="legacyFileInput.click()"
+  [disabled]="importLoading()"
+>
+  <i class="fa-solid fa-database text-slate-400"></i>
+
+  @if (!importLoading()) {
+    <span>استيراد متبرعين جدد</span>
+  } @else {
+    <span>جاري الاستيراد...</span>
+  }
+</button>
+
+<input
+  type="file"
+  #legacyFileInput
+  hidden
+  accept=".csv"
+  (change)="onLegacyFileSelected($event)"
+/>
 
 <input
   type="file"
@@ -59,7 +86,7 @@
         </div>
         <div>
           <p class="text-slate-500 text-sm font-medium">إجمالي المتبرعين</p>
-          <h3 class="text-2xl font-black text-slate-800">1,250</h3>
+          <h3 class="text-2xl font-black text-slate-800">{{totalDonors()}}</h3>
         </div>
       </div>
 
@@ -69,7 +96,7 @@
         </div>
         <div>
           <p class="text-slate-500 text-sm font-medium">حملات نُظمت</p>
-          <h3 class="text-2xl font-black text-slate-800">32</h3>
+          <h3 class="text-2xl font-black text-slate-800">{{campaigns().length}}</h3>
         </div>
       </div>
 

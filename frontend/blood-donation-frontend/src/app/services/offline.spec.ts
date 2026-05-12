@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { Import } from './import';
+import { Offline } from './offline';
 
-describe('Import', () => {
-  let service: Import;
+describe('Offline', () => {
+  let service: Offline;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(Import);
+    service = TestBed.inject(Offline);
   });
 
   it('should be created', () => {
