@@ -33,6 +33,12 @@ export const campaignController = {
     res.status(201).json(result);
   },
 
+  async removeDonor(req: Request, res: Response) {
+    const { campaignId, nationalId } = req.params;
+    const result = await campaignService.removeDonor(campaignId as string, nationalId as string);
+    res.json(result);
+  },
+
   async exportDonorsCsv(req: Request, res: Response) {
     const { campaignId } = req.params;
     const { bloodType } = req.query;

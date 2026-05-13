@@ -24,7 +24,6 @@ export interface AuthResponse {
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
 
-  // 1. استخراج البيانات من localStorage فوراً قبل تعريف الـ Signals
   private getInitialToken(): string | null {
     if (typeof localStorage !== 'undefined') {
       return localStorage.getItem('token');
@@ -44,12 +43,10 @@ export class AuthService {
     return null;
   }
 
-  // 2. تعريف الـ Signals بقيم ابتدائية حقيقية (عشان الـ Refresh ما يرميش على الـ Login)
   private currentUserSignal = signal<User | null>(this.getInitialUser());
   private tokenSignal = signal<string | null>(this.getInitialToken());
   private isLoadingSignal = signal(false);
 
-  // 3. الـ Readonly والمشتقات (Computed)
   currentUser = this.currentUserSignal.asReadonly();
   token = this.tokenSignal.asReadonly();
   isLoading = this.isLoadingSignal.asReadonly();
@@ -57,7 +54,6 @@ export class AuthService {
   isAdmin = computed(() => this.currentUserSignal()?.role === 'ADMIN');
 
   constructor(private http: HttpClient) {
-    // الـ Constructor هنا بقى "رايق" لأن البيانات اتسحبت فوق خلاص
   }
 
   register(email: string, password: string): Observable<AuthResponse> {

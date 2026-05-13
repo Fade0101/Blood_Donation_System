@@ -15,6 +15,6 @@ export const adminGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  router.navigate(['/home']); // أو login لو مش مسجل أصلاً
+  router.navigate(['/home']);
   return false;
 };

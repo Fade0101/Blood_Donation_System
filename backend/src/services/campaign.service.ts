@@ -6,6 +6,7 @@ import {
   updateCampaign,
   deleteCampaign,
   getCampaignDonors,
+  removeDonorFromCampaign,
 } from "../repositories/campaign.repository";
 import { createCampaignSchema, updateCampaignSchema, CreateCampaignDTO, UpdateCampaignDTO } from "../types/campaign.types";
 import { AppError } from "../middlewares/errorHandler";
@@ -19,6 +20,14 @@ export const campaignService = {
       throw new AppError(404, "Campaign not found");
     }
     return await registerDonorToCampaign(campaignId, data);
+  },
+
+  async removeDonor(campaignId: string, nationalId: string) {
+    const campaign = await getCampaignById(campaignId);
+    if (!campaign) {
+      throw new AppError(404, "Campaign not found");
+    }
+    return await removeDonorFromCampaign(campaignId, nationalId);
   },
 
   async createNewCampaign(data: CreateCampaignDTO) {

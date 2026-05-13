@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core'; // ضيف OnInit
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';

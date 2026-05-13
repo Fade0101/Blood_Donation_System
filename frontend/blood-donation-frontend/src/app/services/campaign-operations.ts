@@ -18,6 +18,10 @@ private apiUrl = `${environment.baseurl}/api/campaigns`;
     return this.http.post<RegisterDonorResponse>(`${this.apiUrl}/${campaignId}/register`, payload);
   }
 
+  removeDonorFromCampaign(campaignId: string, nationalId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${campaignId}/donors/${nationalId}`);
+  }
+
   // ================= EXPORT CSV =================
 exportCampaignDonors(campaignId: string, bloodType?: string): Observable<HttpResponse<Blob>> {
   let params = new HttpParams();

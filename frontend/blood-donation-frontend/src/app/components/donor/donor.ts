@@ -109,7 +109,6 @@ async syncData() {
     }
   }
 
-  // 3. أظهر رسالة النجاح فقط لو فيه على الأقل واحد نجح أو الطابور خلص
   if (syncCount > 0) {
     this.toastr.success('تم مزامنة البيانات بنجاح');
   }
@@ -186,7 +185,6 @@ getDonors() {
   // createDonor() {
   //   if (this.donorForm.invalid) {
   //     this.markAllTouched();
-  //     this.toastr.warning('من فضلك أكمل البيانات المطلوبة', 'Warning');
   //     return;
   //   }
 
@@ -206,11 +204,9 @@ getDonors() {
   //   this.donorService.createDonor(payload).subscribe({
   //     next: (newDonor) => {
   //       this.donors.update(list => [newDonor, ...list]);
-  //       this.toastr.success('تم إضافة المتبرع بنجاح 🎉', 'Success', { timeOut: 2000 });
   //       this.closeModal();
   //     },
   //     error: err =>
-  //       this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
   //   });
   // }
   
@@ -283,7 +279,6 @@ saveDonor() {
     };
 
     if (this.isEditMode && this.selectedDonorId) {
-      // حالة التعديل (Edit)
       this.donorService.updateDonor(this.selectedDonorId, payload).subscribe({
         next: updated => {
           if (!updated) return;
@@ -296,15 +291,12 @@ saveDonor() {
         error: () => this.toastr.error('فشل التحديث', 'Error')
       });
     } else {
-      // حالة الإضافة (Create) - بننادي الدالة اللي تحتها
       this.createDonor(payload);
     }
   }
 
-  // الدالة اللي كانت ناقصة أو فيها مشكلة في الاسم
   createDonor(payload: CreateDonorRequest) {
     if (navigator.onLine) {
-      // لو أونلاين: ابعت للسيرفر
       this.donorService.createDonor(payload).subscribe({
         next: (newDonor) => {
           this.donors.update(list => [newDonor, ...list]);
@@ -314,14 +306,11 @@ saveDonor() {
         error: err => this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع', 'Error')
       });
     } else {
-    // التعديل هنا: اتأكد إن الـ payload فيه داتا فعلاً قبل ما تبعته
     console.log('Saving to offline storage:', payload); 
     
-    // تأكد إنك بتبعت الـ payload كامل
     this.offlineService.saveStep({...payload}).then(() => {
       this.toastr.info('تم الحفظ أوفلاين');
       
-      // تحديث اللستة في الصفحة الحالية عشان تحس بالتغيير
       this.donors.update(list => [payload as any, ...list]);
       this.closeModal();
     }).catch(err => {

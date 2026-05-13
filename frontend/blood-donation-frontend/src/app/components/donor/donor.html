@@ -218,10 +218,8 @@
           </div>
         </div>
       </div>
-      <!-- شريط الإحصائيات والتنقل (Toolbar) -->
 <div class="flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm mb-4 gap-4">
 
-  <!-- إجمالي المتبرعين (على اليمين) -->
   <div class="flex items-center gap-3">
     <div class="flex items-center justify-center w-10 h-10 bg-red-50 text-red-600 rounded-full border border-red-100">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
@@ -234,10 +232,8 @@
     </div>
   </div>
 
-  <!-- أزرار التنقل (على اليسار) -->
   <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
 
-    <!-- زر السابق -->
     <button
       (click)="prevPage()"
       [disabled]="currentPage() === 1"
@@ -254,12 +250,10 @@
       السابق
     </button>
 
-    <!-- مؤشر الصفحة -->
     <div class="px-4 text-sm font-bold text-red-700">
       {{ currentPage() }} <span class="text-gray-400 font-normal mx-1">/</span> {{ totalPages() }}
     </div>
 
-    <!-- زر التالي -->
     <button
       (click)="nextPage()"
       [disabled]="currentPage() === totalPages()"

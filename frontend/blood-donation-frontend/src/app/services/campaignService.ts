@@ -48,8 +48,6 @@ deleteCampaign(id: string) {
     responseType: 'text' as 'json'
   });
 }
-// في ملف campaignService.ts
-// في ملف src/app/services/campaignService.ts
 getAllDonors(page: number = 1, limit: number = 10, search: string = ''): Observable<any> {
   if (search && search.trim() !== '') {
     const params = new HttpParams().set('q', search);

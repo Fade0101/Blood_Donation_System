@@ -209,17 +209,76 @@ export class CampaignDetailsComponent implements OnInit {
     }
   }
 
+  async removeDonor(donor: any) {
+    const donorId = donor.nationalId?.toString() || donor.id?.toString();
+    if (!donorId) return;
+
+    if (!confirm(`هل أنت متأكد من إزالة ${donor.name} من الحملة؟`)) {
+      return;
+    }
+
+    // If offline, try to see if it's an offline addition and just remove it locally
+    if (!this.isOnline()) {
+      if (donor.isOffline || donor.offlineSyncId) {
+        // Find it in offline DB and delete it
+        const pendingActions = await this.offlineService.getAllSteps();
+        const action = pendingActions.find(a => 
+          a.data?.nationalId === donor.nationalId && a.data?.syncType === 'CAMPAIGN_ADD'
+        );
+        
+        if (action?.id) {
+          await this.offlineService.deleteStep(action.id);
+          this.campaignDonors.update(list => list.filter((d: any) => d.nationalId !== donor.nationalId));
+          this.toastr.success('تمت الإزالة (أوفلاين)');
+          return;
+        }
+      }
+
+      // If it's an already synced donor, register a REMOVE action
+      try {
+        await this.offlineService.saveStep({ 
+          nationalId: donor.nationalId, 
+          campaignId: this.campaignId, 
+          syncType: 'CAMPAIGN_REMOVE' 
+        });
+        this.campaignDonors.update(list => list.filter((d: any) => d.nationalId !== donor.nationalId));
+        this.toastr.info('تم تسجيل الإزالة أوفلاين');
+      } catch (err) {
+        this.toastr.error('فشل في حفظ إجراء الإزالة أوفلاين');
+      }
+      return;
+    }
+
+    // Online Removal
+    this.opsService.removeDonorFromCampaign(this.campaignId, donor.nationalId).subscribe({
+      next: () => {
+        this.toastr.success('تمت الإزالة بنجاح');
+        this.loadCampaignDonors();
+      },
+      error: (err) => this.toastr.error(err?.error?.message || 'خطأ في الإزالة')
+    });
+  }
+
   async syncOfflineData() {
     const pendingActions = await this.offlineService.getAllSteps();
     if (pendingActions.length === 0) return;
 
     for (const action of pendingActions) {
-      this.opsService.registerDonorToCampaign(this.campaignId, action.data).subscribe({
-        next: () => {
-          this.offlineService.deleteStep(action.id!);
-          this.loadCampaignDonors();
-        }
-      });
+      if (action.data.syncType === 'CAMPAIGN_REMOVE') {
+        this.opsService.removeDonorFromCampaign(this.campaignId, action.data.nationalId).subscribe({
+          next: () => {
+            this.offlineService.deleteStep(action.id!);
+            this.loadCampaignDonors();
+          }
+        });
+      } else {
+        this.opsService.registerDonorToCampaign(this.campaignId, action.data).subscribe({
+          next: () => {
+            this.offlineService.deleteStep(action.id!);
+            this.loadCampaignDonors();
+          }
+        });
+      }
     }
   }
 
