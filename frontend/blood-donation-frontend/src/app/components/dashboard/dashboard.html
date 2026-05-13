@@ -1,62 +1,294 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-red-50 to-pink-50 pt-28 px-6" dir="rtl">
-  <div class="max-w-7xl mx-auto space-y-8">
+<div
+  class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-28 px-4 md:px-6 pb-12"
+  dir="rtl"
+>
+  <div class="max-w-7xl mx-auto space-y-6">
 
-    <div class="bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-3xl shadow-xl p-8 flex justify-between items-center">
-      <div>
-        <h1 class="text-3xl font-bold">🩸 لوحة التحكم</h1>
-        <p class="text-red-100 mt-2">إحصائيات بنك الدم</p>
-      </div>
-      <img src="/HabashyBblood.jpg" class="w-20 h-20 rounded-2xl border-2 border-white object-cover" />
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div class="bg-white p-6 rounded-2xl shadow">
-        <p>إجمالي المتبرعين</p>
-        <h2 class="text-3xl text-red-600 font-bold">{{ totalDonors() }}</h2>
-      </div>
-
-      <div class="bg-white p-6 rounded-2xl shadow">
-        <p>الحملات</p>
-        <h2 class="text-3xl text-blue-600 font-bold">{{ totalCampaigns() }}</h2>
-      </div>
-
-      <div class="bg-white p-6 rounded-2xl shadow">
-        <p>داخل الحملات</p>
-        <h2 class="text-3xl text-green-600 font-bold">{{ totalCampaignDonors() }}</h2>
-      </div>
-
-      <div class="bg-white p-6 rounded-2xl shadow">
-        <p>جدد (3 أيام)</p>
-        <h2 class="text-3xl text-purple-600 font-bold">{{ newDonors() }}</h2>
+    <!-- ===== HEADER ===== -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-red-900 via-red-800 to-red-900 text-white rounded-3xl shadow-2xl p-8 md:p-10">
+      <div class="absolute -top-10 -right-10 w-40 h-40 bg-white opacity-5 rounded-full"></div>
+      <div class="absolute bottom-0 left-0 w-64 h-1 bg-gradient-to-r from-transparent via-red-400 to-transparent opacity-40"></div>
+      <div class="relative flex justify-between items-center">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-3 h-3 bg-red-400 rounded-full animate-pulse"></div>
+            <span class="text-red-300 text-sm font-medium">مباشر</span>
+          </div>
+          <h1 class="text-4xl md:text-5xl font-bold text-white">لوحة التحكم</h1>
+          <p class="text-red-200 mt-2 text-base">إحصائيات بنك الدم المتقدمة — آخر تحديث منذ دقيقتين</p>
+        </div>
+        <div class="flex flex-col items-end gap-3">
+          <img
+            src="/HabashyBblood.jpg"
+            class="w-20 h-20 md:w-24 md:h-24 rounded-2xl border-2 border-red-600 object-cover shadow-lg hidden md:block"
+          />
+        </div>
       </div>
     </div>
 
+    <!-- ===== KPI CARDS ===== -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <!-- Total Donors -->
+      <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow border border-gray-100 dark:border-slate-700 p-5 overflow-hidden">
+        <div class="absolute top-0 right-0 w-1 h-full bg-red-500 rounded-l-full"></div>
+        <div class="w-10 h-10 bg-red-50 dark:bg-red-900/30 rounded-xl flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" /></svg>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">إجمالي المتبرعين</p>
+        <h2 class="text-3xl font-bold text-red-600">{{ totalDonors() }}</h2>
+        <div class="mt-2 flex items-center gap-2">
+          <span class="inline-flex items-center bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold px-2 py-0.5 rounded-full">
+            +{{ donorGrowthRate() }}%
+          </span>
+          <span class="text-gray-400 text-xs">نمو آخر 7 أيام</span>
+        </div>
+      </div>
+
+      <!-- Campaigns -->
+      <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow border border-gray-100 dark:border-slate-700 p-5 overflow-hidden">
+        <div class="absolute top-0 right-0 w-1 h-full bg-blue-500 rounded-l-full"></div>
+        <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" /></svg>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">عدد الحملات</p>
+        <h2 class="text-3xl font-bold text-blue-600">{{ totalCampaigns() }}</h2>
+        <div class="mt-2 flex items-center gap-2">
+          <span class="inline-flex items-center bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-semibold px-2 py-0.5 rounded-full">
+            {{ campaignSuccessRate() }}%
+          </span>
+          <span class="text-gray-400 text-xs">معدل النجاح</span>
+        </div>
+      </div>
+
+      <!-- Campaign Donors -->
+      <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow border border-gray-100 dark:border-slate-700 p-5 overflow-hidden">
+        <div class="absolute top-0 right-0 w-1 h-full bg-emerald-500 rounded-l-full"></div>
+        <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">متبرعو الحملات</p>
+        <h2 class="text-3xl font-bold text-emerald-600">{{ totalCampaignDonors() }}</h2>
+        <div class="mt-2 flex items-center gap-2">
+          <span class="inline-flex items-center bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-semibold px-2 py-0.5 rounded-full">
+            {{ campaignParticipationRate() }}%
+          </span>
+          <span class="text-gray-400 text-xs">نسبة المشاركة</span>
+        </div>
+      </div>
+
+      <!-- Rarest Blood Type -->
+      <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow border border-gray-100 dark:border-slate-700 p-5 overflow-hidden">
+        <div class="absolute top-0 right-0 w-1 h-full bg-purple-500 rounded-l-full"></div>
+        <div class="w-10 h-10 bg-purple-50 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-3">
+          <svg class="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 text-xs font-medium mb-1">الفصيلة الأندر</p>
+        <h2 class="text-3xl font-bold text-purple-600">{{ rarestBloodType() }}</h2>
+        <div class="mt-2 flex items-center gap-2">
+          <span class="inline-flex items-center bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-semibold px-2 py-0.5 rounded-full">
+            {{ rarestCount() }} متبرع فقط
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SECONDARY KPI ROW ===== -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center text-blue-600 text-sm font-bold">♂</div>
+        <div>
+          <p class="text-xs text-gray-400">ذكور</p>
+          <p class="text-lg font-bold text-gray-800 dark:text-white">{{ maleCount() }} <span class="text-xs font-normal text-blue-500">{{ malePercentage() }}%</span></p>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 bg-pink-100 dark:bg-pink-900/40 rounded-lg flex items-center justify-center text-pink-600 text-sm font-bold">♀</div>
+        <div>
+          <p class="text-xs text-gray-400">إناث</p>
+          <p class="text-lg font-bold text-gray-800 dark:text-white">{{ femaleCount() }} <span class="text-xs font-normal text-pink-500">{{ femalePercentage() }}%</span></p>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 bg-red-100 dark:bg-red-900/40 rounded-lg flex items-center justify-center text-red-600 text-xs font-bold">متوسط</div>
+        <div>
+          <p class="text-xs text-gray-400">متوسط متبرعي الحملة</p>
+          <p class="text-lg font-bold text-gray-800 dark:text-white">{{ averageDonorsPerCampaign() }}</p>
+        </div>
+      </div>
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 px-4 py-3 flex items-center gap-3">
+        <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center text-emerald-600 text-xs font-bold">جدد</div>
+        <div>
+          <p class="text-xs text-gray-400">متبرعون جدد (7 أيام)</p>
+          <p class="text-lg font-bold text-gray-800 dark:text-white">{{ newDonors() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CHARTS ===== -->
     @if (isBrowser && donors().length > 0) {
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <div class="bg-white p-6 rounded-2xl shadow">
-          <h3 class="font-bold mb-4">🩸 فصائل الدم</h3>
-          <canvas baseChart [type]="bloodPieChartType" [data]="bloodPieChartData"></canvas>
+      <!-- Row 1: Blood Types + Gender -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        <!-- Blood Types Doughnut -->
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border border-gray-100 dark:border-slate-700">
+          <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-1">🩸 توزيع فصائل الدم</h3>
+          <p class="text-xs text-gray-400 mb-4">نسبة كل فصيلة من إجمالي المتبرعين</p>
+          <!-- Custom Legend -->
+          <div class="flex flex-wrap gap-3 mb-4" id="blood-legend-container">
+            @for (item of bloodTypeStats(); track item.type) {
+              <span class="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+                <span class="inline-block w-2.5 h-2.5 rounded-sm" [style.background]="bloodColorMap[item.type] || '#888'"></span>
+                {{ item.type }} {{ item.percentage }}%
+              </span>
+            }
+          </div>
+          <div class="relative h-[260px] w-full">
+            <canvas baseChart [type]="bloodDoughnutChartType" [data]="bloodDoughnutChartData" [options]="bloodTypeChartOptions"></canvas>
+          </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow">
-          <h3 class="font-bold mb-4">🏆 الحملات</h3>
-          <canvas baseChart [type]="campaignBarChartType" [data]="campaignBarChartData"></canvas>
+        <!-- Gender + Sparkline -->
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border border-gray-100 dark:border-slate-700">
+          <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-1">👥 توزيع الجنس</h3>
+          <p class="text-xs text-gray-400 mb-4">نسبة الذكور والإناث بين المتبرعين</p>
+          <!-- Gender bar -->
+          <div class="flex gap-4 mb-4">
+            <div class="flex-1 text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+              <p class="text-2xl font-bold text-blue-600">{{ maleCount() }}</p>
+              <p class="text-xs text-blue-500 mt-1">ذكور · {{ malePercentage() }}%</p>
+            </div>
+            <div class="flex-1 text-center p-3 bg-pink-50 dark:bg-pink-900/20 rounded-xl">
+              <p class="text-2xl font-bold text-pink-500">{{ femaleCount() }}</p>
+              <p class="text-xs text-pink-400 mt-1">إناث · {{ femalePercentage() }}%</p>
+            </div>
+          </div>
+          <div class="flex h-2.5 rounded-full overflow-hidden mb-4">
+            <div class="bg-blue-500 transition-all duration-700" [style.width]="malePercentage() + '%'"></div>
+            <div class="bg-pink-400 transition-all duration-700" [style.width]="femalePercentage() + '%'"></div>
+          </div>
+          <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-1 mt-4">📈 نمو المتبرعين (7 أيام)</h3>
+          <div class="relative h-[130px] w-full">
+            <canvas baseChart [type]="growthLineChartType" [data]="growthLineChartData" [options]="growthChartOptions"></canvas>
+          </div>
         </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow">
-          <h3 class="font-bold mb-4">📈 النمو</h3>
-          <canvas baseChart [type]="growthLineChartType" [data]="growthLineChartData"></canvas>
-        </div>
-
       </div>
+
+      <!-- Row 2: Campaigns + Blood Stats -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        <!-- Campaign Bar -->
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border border-gray-100 dark:border-slate-700">
+          <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-1">🏆 أداء الحملات</h3>
+          <p class="text-xs text-gray-400 mb-4">عدد المتبرعين لكل حملة مرتبًا تنازليًا</p>
+          <div class="relative h-[220px] w-full mb-4">
+            <canvas baseChart [type]="campaignBarChartType" [data]="campaignBarChartData" [options]="campaignChartOptions"></canvas>
+          </div>
+          <!-- Campaign mini-list -->
+          <div class="space-y-2 max-h-[160px] overflow-y-auto">
+            @for (c of campaigns(); track c.id) {
+              <div class="flex items-center gap-3 px-3 py-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                <span class="text-xs text-gray-500 dark:text-gray-400 w-20 truncate">#{{ c.campaignNumber || c.id }}</span>
+                <div class="flex-1 h-1.5 bg-gray-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                  <div class="h-full bg-red-500 rounded-full transition-all duration-700"
+                    [style.width]="getCampaignWidthPercent(c.id) + '%'">
+                  </div>
+                </div>
+                <span class="text-xs font-semibold text-red-600 w-8 text-left">{{ getCampaignDonorCount(c.id) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+<!-- Age Distribution Card -->
+<div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border border-gray-100 dark:border-slate-700">
+  <div class="flex justify-between items-center mb-4">
+    <div>
+      <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-1">🎂 التوزيع العمري</h3>
+      <p class="text-xs text-gray-400">تحليل الفئات العمرية للمتبرعين</p>
+    </div>
+    <div class="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg">
+       متوسط العمر: {{ calculateAverageAge() }} عاماً
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+    <!-- Chart -->
+    <div class="relative h-[200px]">
+      <canvas baseChart 
+        [type]="'pie'" 
+        [data]="ageGroupChartData" 
+        [options]="{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }">
+      </canvas>
+    </div>
+
+    <!-- Stats List -->
+    <div class="space-y-3">
+      @for (stat of ageStats() | keyvalue; track stat.key) {
+        <div class="flex flex-col">
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-gray-600 dark:text-gray-400">{{ stat.key }}</span>
+            <span class="font-bold text-gray-800 dark:text-white">{{ stat.value }}</span>
+          </div>
+          <div class="w-full h-1.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div class="h-full bg-indigo-500 rounded-full" 
+                 [style.width]="(stat.value / totalDonors() * 100) + '%'">
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+        <!-- Blood Type Stats Table + Radar -->
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow border border-gray-100 dark:border-slate-700">
+          <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-1">📊 إحصائيات فصائل الدم</h3>
+          <p class="text-xs text-gray-400 mb-4">ترتيب الفصائل من الأكثر إلى الأقل</p>
+          <div class="space-y-2 mb-5 max-h-[200px] overflow-y-auto">
+            @for (item of bloodTypeStats(); track item.type) {
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-semibold w-10 text-gray-700 dark:text-gray-300">{{ item.type }}</span>
+                <div class="flex-1 h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-700"
+                    [style.width]="item.percentage + '%'"
+                    [style.background]="bloodColorMap[item.type] || '#888'">
+                  </div>
+                </div>
+                <span class="text-xs text-gray-500 w-8 text-left">{{ item.count }}</span>
+                <span class="text-xs font-medium text-gray-400 w-8 text-left">{{ item.percentage }}%</span>
+              </div>
+            }
+          </div>
+          <!-- Blood Type Compatibility -->
+          <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-3">🔄 توافق الفصائل</h3>
+          <div class="grid grid-cols-4 gap-2 mb-5">
+            @for (item of compatibilityData; track item.type) {
+              <div class="rounded-xl p-2 text-center border border-gray-100 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50"
+                   [style.border-top]="'3px solid ' + (bloodColorMap[item.type] || '#888')">
+                <p class="text-sm font-bold mb-0.5" [style.color]="bloodColorMap[item.type] || '#888'">{{ item.type }}</p>
+                <p class="text-[9px] text-gray-400 dark:text-gray-500 mb-1">يعطي لـ</p>
+                <p class="text-[9px] text-gray-600 dark:text-gray-300 leading-tight">{{ item.givesTo }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Radar -->
+          <!-- <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-2">🎯 تحليل الرادار</h3>
+          <div class="relative h-[180px] w-full">
+            <canvas baseChart [type]="radarChartType" [data]="radarChartData" [options]="radarChartOptions"></canvas>
+          </div> -->
+        </div>
+      </div>
+
     } @else if (loading()) {
-      <div class="bg-white p-10 rounded-2xl shadow text-center text-gray-500">
-        جاري تحميل البيانات...
+      <div class="bg-white dark:bg-slate-800 p-12 rounded-2xl shadow text-center border border-gray-100 dark:border-slate-700">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
+        <p class="text-gray-500 dark:text-gray-400 text-base">جاري تحميل البيانات...</p>
       </div>
     } @else {
-      <div class="bg-white p-10 rounded-2xl shadow text-center text-gray-500">
-        لا توجد بيانات كافية لعرض الرسوم البيانية.
+      <div class="bg-white dark:bg-slate-800 p-12 rounded-2xl shadow text-center border-2 border-dashed border-gray-200 dark:border-slate-700">
+        <p class="text-gray-400 text-base">لا توجد بيانات كافية لعرض الرسوم البيانية.</p>
       </div>
     }
 

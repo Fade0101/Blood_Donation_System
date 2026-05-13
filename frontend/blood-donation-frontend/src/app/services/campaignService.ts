@@ -62,4 +62,8 @@ getAllDonors(page: number = 1, limit: number = 10, search: string = ''): Observa
 
   return this.http.get<any>(this.donorsUrl, { params });
 }
+
+getAllDonorsStatic(): Observable<any> {
+  return this.http.get<any>(this.donorsUrl); 
+}
 }
