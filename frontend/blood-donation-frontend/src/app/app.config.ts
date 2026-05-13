@@ -20,12 +20,10 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([authInterceptor, errorInterceptor, offlineInterceptor])
     ),
-    // 1. انقل الـ Service Worker هنا وخلي الاستراتيجية دي:
     provideServiceWorker('ngsw-worker.js', {
       enabled: true, 
-      registrationStrategy: 'registerWhenStable:3000' // استنى 3 ثواني الاستقرار وبعدين سجل
+      registrationStrategy: 'registerWhenStable:3000'
     }),
-    // 2. الـ Hydration يفضل في الآخر
     provideClientHydration(withEventReplay()),
 provideToastr({
       timeOut: 2500,

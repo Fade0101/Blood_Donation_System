@@ -130,3 +130,42 @@ export const getCampaignDonors = async (campaignId: string, bloodTypeFilter?: an
 
   return registrations;
 };
+
+export const removeDonorFromCampaign = async (campaignId: string, nationalId: string) => {
+  return await prisma.$transaction(async (tx) => {
+    // 1. Find the donor by nationalId
+    const donor = await tx.donor.findUnique({
+      where: { nationalId }
+    });
+
+    if (!donor) {
+      throw new Error("المتبرع غير موجود.");
+    }
+
+    // 2. Check if the donor is actually registered in this campaign
+    const existingRegistration = await tx.donorCampaign.findUnique({
+      where: {
+        donorId_campaignId: {
+          donorId: donor.id,
+          campaignId: campaignId
+        }
+      }
+    });
+
+    if (!existingRegistration) {
+      throw new Error("المتبرع غير مسجل في هذه الحملة.");
+    }
+
+    // 3. Delete the registration
+    await tx.donorCampaign.delete({
+      where: {
+        donorId_campaignId: {
+          donorId: donor.id,
+          campaignId: campaignId
+        }
+      }
+    });
+
+    return { success: true, message: "تمت إزالة المتبرع من الحملة بنجاح" };
+  });
+};

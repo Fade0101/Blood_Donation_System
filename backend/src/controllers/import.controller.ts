@@ -8,11 +8,9 @@
 //   async importBloodBank(req: Request & { file?: Express.Multer.File }, res: Response, next: NextFunction) {
 //     try {
 //       if (!req.file) {
-//         throw new AppError(400, "لم يتم تحميل ملف CSV");
 //       }
 
 //       if (!req.file.mimetype.includes("csv") && !req.file.originalname.endsWith(".csv")) {
-//         throw new AppError(400, "الملف يجب أن يكون بصيغة CSV");
 //       }
 
 //       // Parse CSV with relaxed column validation
@@ -25,7 +23,6 @@
 //       });
 
 //       if (records.length === 0) {
-//         throw new AppError(400, "ملف CSV فارغ");
 //       }
 
 //       // Import donors
@@ -33,7 +30,6 @@
 
 //       res.status(200).json({
 //         success: true,
-//         message: "تم استيراد البيانات بنجاح",
 //         data: result,
 //         error: null,
 //       });

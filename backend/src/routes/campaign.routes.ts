@@ -41,6 +41,10 @@ router.post(
   validateRequest(registerDonorSchema, "body"),
   catchAsync(campaignController.registerDonor)
 );
+router.delete(
+  "/:campaignId/donors/:nationalId",
+  catchAsync(campaignController.removeDonor)
+);
 router.get(
   "/:campaignId/export",
   catchAsync(campaignController.exportDonorsCsv)

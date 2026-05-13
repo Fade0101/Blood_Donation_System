@@ -10,8 +10,8 @@ router.post('/register', register);
 router.post('/login', login);
 
 // User routes (protected) - specific routes before parameterized routes
-router.get('/pending', verifyToken, requireRole(['ADMIN']), getPendingUsers); // هيبقى /api/users/pending
-router.get('/', verifyToken, requireRole(['ADMIN']), getAllUsers);            // هيبقى /api/users
+router.get('/pending', verifyToken, requireRole(['ADMIN']), getPendingUsers);
+router.get('/', verifyToken, requireRole(['ADMIN']), getAllUsers);
 router.patch('/:id/approve', verifyToken, requireRole(['ADMIN']), approveUser);
 router.patch('/:id/reject', verifyToken, requireRole(['ADMIN']), rejectUser);
 router.patch('/:id/role', verifyToken, requireRole(['ADMIN']), updateUserRole);

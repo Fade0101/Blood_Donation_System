@@ -67,11 +67,11 @@ function mapLegacyBloodType(raw: string | undefined): BloodType | null {
 
 function mapLegacyGender(raw: string | undefined): "MALE" | "FEMALE" | undefined {
   if (!raw || typeof raw !== "string") return undefined;
-  
+
   const trimmed = raw.trim();
   if (trimmed === "ذكر" || trimmed.toUpperCase() === "MALE") return "MALE";
   if (trimmed === "أنثى" || trimmed === "انثى" || trimmed.toUpperCase() === "FEMALE") return "FEMALE";
-  
+
   return undefined;
 }
 
@@ -113,17 +113,27 @@ export const importService = {
       errors: [] as any[],
     };
 
+    const cleanNumber = (val: any) => {
+      if (!val) return null;
+      let str = String(val).replace(/\s+/g, '').replace(/[\u200B-\uFEFF]/g, '');
+      if (str.toLowerCase().includes('e')) return null;
+      if (str.endsWith('.0')) str = str.slice(0, -2);
+      if (str.length === 10 && str.startsWith('1')) return '0' + str;
+      if (str === "") return null;
+      return str;
+    };
+
     for (let i = 0; i < rows.length; i++) {
       const rowNumber = i + 2;
       const row = normalizeRow(rows[i]);
 
+      let phone = cleanNumber(row.phone);
+      let nationalId = cleanNumber(row.nationalId);
+      let name = row.name ? String(row.name).replace(/\s+/g, ' ').trim() : null;
+
       try {
-        if (!row.nationalId || !row.name || !row.phone || !row.campaignNumber) {
+        if ((!nationalId && !phone && !name) || !row.campaignNumber) {
           result.skipped++;
-          result.errors.push({
-            row: rowNumber,
-            reason: "Missing required fields",
-          });
           continue;
         }
 
@@ -133,44 +143,50 @@ export const importService = {
 
         if (!campaign) {
           result.skipped++;
-          result.errors.push({
-            row: rowNumber,
-            reason: "Campaign not found",
-          });
           continue;
         }
 
         await prisma.$transaction(async (tx) => {
-          const donor = await tx.donor.upsert({
-            where: { nationalId: row.nationalId },
-            update: {
-              name: row.name,
-              phone: row.phone,
-              address: row.address || null,
-              bloodType:
-                row.bloodType && isValidBloodType(row.bloodType)
-                  ? row.bloodType
-                  : null,
-              gender: extractGenderFromRow(row),
-            },
-            create: {
-              nationalId: row.nationalId,
-              name: row.name,
-              phone: row.phone,
-              address: row.address || null,
-              bloodType:
-                row.bloodType && isValidBloodType(row.bloodType)
-                  ? row.bloodType
-                  : null,
-              gender: extractGenderFromRow(row),
-            },
-          });
+          let existingDonor = null;
+
+          if (nationalId) {
+            existingDonor = await tx.donor.findFirst({ where: { nationalId: nationalId } });
+          }
+          if (!existingDonor && phone) {
+            existingDonor = await tx.donor.findFirst({ where: { phone: phone } });
+          }
+          if (!existingDonor && name) {
+            existingDonor = await tx.donor.findFirst({ where: { name: name } });
+          }
+
+          const validBloodType = mapLegacyBloodType(row.bloodType) || (row.bloodType && isValidBloodType(row.bloodType) ? row.bloodType : null);
+          const validGender = mapLegacyGender(row.gender) || (row.gender === "MALE" || row.gender === "FEMALE" ? row.gender : null);
+
+          let donor;
+          if (existingDonor) {
+            donor = await tx.donor.update({
+              where: { id: existingDonor.id },
+              data: {
+                bloodType: (!existingDonor.bloodType && validBloodType) ? validBloodType : existingDonor.bloodType,
+                gender: (!existingDonor.gender && validGender) ? validGender : existingDonor.gender,
+              },
+            });
+          } else {
+            const fallbackId = `LEGACY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+            donor = await tx.donor.create({
+              data: {
+                nationalId: nationalId || phone || fallbackId,
+                name: name || "Unknown",
+                phone: phone || "Unknown",
+                address: row.address || null,
+                bloodType: validBloodType,
+                gender: validGender,
+              },
+            });
+          }
 
           const exists = await tx.donorCampaign.findFirst({
-            where: {
-              donorId: donor.id,
-              campaignId: campaign.id,
-            },
+            where: { donorId: donor.id, campaignId: campaign.id },
           });
 
           if (!exists) {
@@ -178,10 +194,9 @@ export const importService = {
               data: {
                 donorId: donor.id,
                 campaignId: campaign.id,
-                offlineSyncId: `csv-${row.nationalId}-${campaign.id}`,
+                offlineSyncId: `csv-${donor.id}-${campaign.id}`,
               },
             });
-
             result.inserted++;
           } else {
             result.updated++;
@@ -189,16 +204,11 @@ export const importService = {
         });
       } catch (err: any) {
         result.skipped++;
-        result.errors.push({
-          row: rowNumber,
-          reason: err.message || "Unknown error",
-        });
+        result.errors.push({ row: rowNumber, reason: err.message });
       }
     }
-
     return result;
   },
-
   // ========================================================================
   // LEGACY IMPORT
   // ========================================================================
@@ -235,53 +245,53 @@ export const importService = {
 
           for (const row of rows) {
             try {
-const name = row["الاسم"] ? String(row["الاسم"]).trim().replace(/\s+/g, ' ') : null;
-let phone = row["الموبيل"] ? String(row["الموبيل"]).trim() : null;
+              const name = row["الاسم"] ? String(row["الاسم"]).trim().replace(/\s+/g, ' ') : null;
+              let phone = row["الموبيل"] ? String(row["الموبيل"]).trim() : null;
 
-if (phone && phone.length === 10 && phone.startsWith("1")) {
-  phone = "0" + phone;
-}
+              if (phone && phone.length === 10 && phone.startsWith("1")) {
+                phone = "0" + phone;
+              }
 
-if (!name && !phone) {
-  continue;
-}
+              if (!name && !phone) {
+                continue;
+              }
 
-let nationalId = row["National ID"] ? String(row["National ID"]).trim() : null;
+              let nationalId = row["National ID"] ? String(row["National ID"]).trim() : null;
 
-if (!nationalId) {
-  if (name) {
-    const existingByName = await prisma.donor.findFirst({
-      where: { name: name }
-    });
-    
-    if (existingByName) {
-      nationalId = existingByName.nationalId;
-    }
-  }
+              if (!nationalId) {
+                if (name) {
+                  const existingByName = await prisma.donor.findFirst({
+                    where: { name: name }
+                  });
 
-  if (!nationalId && phone) {
-    const existingByPhone = await prisma.donor.findFirst({
-      where: { phone: phone }
-    });
+                  if (existingByName) {
+                    nationalId = existingByName.nationalId;
+                  }
+                }
 
-    if (existingByPhone) {
-      nationalId = existingByPhone.nationalId;
-    }
-  }
-}
+                if (!nationalId && phone) {
+                  const existingByPhone = await prisma.donor.findFirst({
+                    where: { phone: phone }
+                  });
 
-if (!nationalId) {
-  const fallbackId = `LEGACY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-  nationalId = phone || fallbackId;
-}
-await donorRepository.upsert(nationalId, {
-  name: name || "Unknown",
-  phone: phone || "Unknown",
-  address: row["العنوان"] || null,
-  bloodType: mapLegacyBloodType(row["الدم"]),
-  gender: extractGenderFromRow(row),
-  email: row["E-mail"] || null,
-});
+                  if (existingByPhone) {
+                    nationalId = existingByPhone.nationalId;
+                  }
+                }
+              }
+
+              if (!nationalId) {
+                const fallbackId = `LEGACY-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+                nationalId = phone || fallbackId;
+              }
+              await donorRepository.upsert(nationalId, {
+                name: name || "Unknown",
+                phone: phone || "Unknown",
+                address: row["العنوان"] || null,
+                bloodType: mapLegacyBloodType(row["الدم"]),
+                gender: extractGenderFromRow(row),
+                email: row["E-mail"] || null,
+              });
 
               successCount++;
             } catch (err) {

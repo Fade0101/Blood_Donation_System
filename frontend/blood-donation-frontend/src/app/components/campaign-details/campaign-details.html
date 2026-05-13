@@ -68,9 +68,14 @@
                 <div class="flex gap-4 items-center">
                   <img [src]="d.imageUrl || 'HabashyBblood.jpg'" class="w-14 h-14 rounded-2xl object-cover border shadow" />
                   <div class="flex-1">
-                    <div class="flex items-center gap-3">
-                      <p class="font-bold text-lg text-gray-800">{{ d.name }}</p>
-                      <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">داخل الحملة</span>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <p class="font-bold text-lg text-gray-800">{{ d.name }}</p>
+                        <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">داخل الحملة</span>
+                      </div>
+                      <button (click)="removeDonor(d)" title="إزالة من الحملة" class="text-red-500 bg-red-50/50 hover:bg-red-100 p-2 rounded-xl transition-all cursor-pointer">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </button>
                     </div>
                     <div class="text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 mt-2 gap-x-4 gap-y-1">
                       <p>📞 {{ d.phone }}</p>

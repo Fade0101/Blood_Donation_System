@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CampaignService } from '../../services/campaignService';
 import { ImportService } from '../../services/import';
 import { ToastrService } from 'ngx-toastr';
-import * as Papa from 'papaparse'; // تأكد من عمل npm install papaparse --legacy-peer-deps
+import * as Papa from 'papaparse';
 
 @Component({
   selector: 'app-home',
@@ -44,9 +44,8 @@ export class Home implements OnInit {
     });
   }
 
-  // ميثود تنظيف فصيلة الدم
 private fixBloodType(type: string): any {
-  if (!type || type.trim() === '' || type === '-') return null; // هينزل في الداتابيز فاضي
+  if (!type || type.trim() === '' || type === '-') return null;
 
   const clean = type.trim().toUpperCase().replace(/\s+/g, '').replace('ـــ', '');
   
@@ -55,13 +54,13 @@ private fixBloodType(type: string): any {
     'B+': 'B_POS',  'B-': 'B_NEG',
     'AB+': 'AB_POS', 'AB-': 'AB_NEG',
     'O+': 'O_POS',  'O-': 'O_NEG',
-    'A_POS': 'A_POS', 'A_NEG': 'A_NEG', // احتياطي
+    'A_POS': 'A_POS', 'A_NEG': 'A_NEG',
     'B_POS': 'B_POS', 'B_NEG': 'B_NEG',
     'AB_POS': 'AB_POS', 'AB_NEG': 'AB_NEG',
     'O_POS': 'O_POS', 'O_NEG': 'O_NEG'
   };
 
-  return map[clean] || null; // لو ملقاش فصيلة مطابقة ينزلها null برضه
+  return map[clean] || null;
 }
 
 onFileSelected(event: any) {
@@ -70,7 +69,6 @@ onFileSelected(event: any) {
 
   this.importLoading.set(true);
 
-  // استخدام FileReader لضمان قراءة الملف بتشفير صحيح
   const reader = new FileReader();
   reader.onload = (e: any) => {
     const content = e.target.result;
@@ -78,19 +76,16 @@ onFileSelected(event: any) {
     Papa.parse(content, {
       header: true,
       skipEmptyLines: true,
-      encoding: "UTF-8", // إجبار التشفير على UTF-8
+      encoding: "UTF-8",
       complete: (results) => {
         const cleanedData = results.data.map((row: any) => ({
           ...row,
-          // تنظيف الاسم من أي رموز غريبة
           name: String(row.name || row['الاسم'] || '').replace(/[^\u0600-\u06FF\s]/g, '').trim(),
           nationalId: String(row.nationalId || row['الرقم القومي'] || '').trim(),
-          // استخدام الميثود القوية لتنظيف الفصيلة
           bloodType: this.fixBloodType(row.bloodType || row['فصيلة الدم'] || ''),
           campaignNumber: Number(row.campaignNumber || row['رقم الحملة'] || 1)
         }));
 
-        // تحويل البيانات لـ CSV جديد مع إضافة BOM لدعم العربي
         const csvString = Papa.unparse(cleanedData);
         const blob = new Blob([`\ufeff${csvString}`], { type: 'text/csv;charset=utf-8;' });
         const cleanedFile = new File([blob], file.name, { type: 'text/csv' });
@@ -109,7 +104,7 @@ onFileSelected(event: any) {
       }
     });
   };
-  reader.readAsText(file, 'utf-8'); // قراءة الملف كـ UTF-8 من البداية
+  reader.readAsText(file, 'utf-8');
 }
 
   onLegacyFileSelected(event: any) {
