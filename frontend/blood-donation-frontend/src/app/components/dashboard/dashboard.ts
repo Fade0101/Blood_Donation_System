@@ -67,14 +67,12 @@ export class DashboardComponent implements OnInit {
     { type: 'AB+', givesTo: 'AB+ فقط' },
   ];
   constructor() {
-    // 🧪 اختبار مراقبة البيانات
-    alert('Dashboard component constructor called!');
+
     effect(() => {
       const currentDonors = this.donors();
 
       if (currentDonors.length > 0) {
         console.log('✅ Effect Detected Data Change!', currentDonors);
-        // alert(`يا مسهل! تم تحميل ${currentDonors.length} متبرع والرسومات المفروض تظهر`);
 
         // استدعاء التحديث هنا يضمن أن الرسوم تتبع البيانات دائماً
         if (this.isBrowser) {
@@ -255,26 +253,26 @@ export class DashboardComponent implements OnInit {
       }))
       .sort((a, b) => b.count - a.count);
   });
-ageStats = computed(() => {
-  const donors = this.donors() || [];
-  const stats: Record<string, number> = {
-    'ناشئ (تحت 20)': 0, 'شباب (20-30)': 0, 'كبار (31-45)': 0, 'مخضرم (فوق 45)': 0, 'غير محدد': 0
-  };
+  ageStats = computed(() => {
+    const donors = this.donors() || [];
+    const stats: Record<string, number> = {
+      'ناشئ (تحت 20)': 0, 'شباب (20-30)': 0, 'كبار (31-45)': 0, 'مخضرم (فوق 45)': 0, 'غير محدد': 0
+    };
 
-  donors.forEach(d => {
-    // لو الـ API مش بيبعت تاريخ ميلاد، هنعتبره غير محدد
-    if (!d.dateOfBirth && !d.age) {
-      stats['غير محدد']++;
-    } else {
-      const age = d.age ?? (new Date().getFullYear() - new Date(d.dateOfBirth).getFullYear());
-      if (age < 20) stats['ناشئ (تحت 20)']++;
-      else if (age <= 30) stats['شباب (20-30)']++;
-      else if (age <= 45) stats['كبار (31-45)']++;
-      else stats['مخضرم (فوق 45)']++;
-    }
+    donors.forEach(d => {
+      // لو الـ API مش بيبعت تاريخ ميلاد، هنعتبره غير محدد
+      if (!d.dateOfBirth && !d.age) {
+        stats['غير محدد']++;
+      } else {
+        const age = d.age ?? (new Date().getFullYear() - new Date(d.dateOfBirth).getFullYear());
+        if (age < 20) stats['ناشئ (تحت 20)']++;
+        else if (age <= 30) stats['شباب (20-30)']++;
+        else if (age <= 45) stats['كبار (31-45)']++;
+        else stats['مخضرم (فوق 45)']++;
+      }
+    });
+    return stats;
   });
-  return stats;
-});
   // ─── Helper Methods ──────────────────────────────────────────────────────────
 
   getCampaignDonorCount(campaignId: string): number {
