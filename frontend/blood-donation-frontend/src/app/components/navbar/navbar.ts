@@ -35,9 +35,7 @@ export class Navbar {
       this.campaignService.openCampaign();
     });
   }
-  toggleDarkMode():void{
-    
-  }
+
 }
 
 

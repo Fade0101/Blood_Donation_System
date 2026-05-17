@@ -7,10 +7,12 @@ import { ToastrService } from 'ngx-toastr';
 import { lastValueFrom } from 'rxjs';
 import { OfflineManagerService } from './services/offline-manager-service';
 import { isPlatformBrowser } from '@angular/common'
+import { Footer } from './components/footer/footer';
+
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar],
+  imports: [RouterOutlet, Navbar, Footer],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
