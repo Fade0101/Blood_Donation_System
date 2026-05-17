@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ImportService {
 
-  private baseUrl = 'http://localhost:5000/api/imports';
+  private baseUrl = `${environment.baseurl}/api/imports`;
 
   constructor(private http: HttpClient) {}
 
