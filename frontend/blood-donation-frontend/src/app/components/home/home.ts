@@ -9,7 +9,8 @@ import { CampaignOperationsService } from '../../services/campaign-operations';
 import { Campaign, Donor } from '../../interfaces/campaign';
 import { Slider, SliderModule } from 'ngx-slider';
 import { DashboardComponent } from "../dashboard/dashboard";
-
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -23,6 +24,7 @@ export class Home implements OnInit {
   private importService = inject(ImportService);
   private toastr = inject(ToastrService);
   private opsService = inject(CampaignOperationsService);
+private router = inject(Router);
 
   fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
@@ -93,23 +95,7 @@ export class Home implements OnInit {
   }
 
   // ── Delete a campaign ─────────────────────────────────────
-  deleteCampaign(campaignId: string) {
-    const campaign = this.campaigns().find((c) => c.id === campaignId);
-    const label = campaign?.bloodBankName
-      ? `${campaign.bloodBankName} (#${campaign.campaignNumber})`
-      : `#${campaign?.campaignNumber ?? campaignId}`;
 
-    if (!confirm(`هل أنت متأكد من حذف الحملة "${label}"؟`)) return;
-
-    this.campaignService.deleteCampaign(campaignId).subscribe({
-      next: () => {
-        this.toastr.success('تم حذف الحملة بنجاح');
-        this.campaigns.update((list) => list.filter((c) => c.id !== campaignId));
-      },
-      error: (err: any) =>
-        this.toastr.error(err?.error?.message || 'فشل في حذف الحملة'),
-    });
-  }
 
   // ── Blood-type normaliser ─────────────────────────────────
   private fixBloodType(type: string): any {
@@ -242,6 +228,46 @@ exportCSV(id: string) {
       console.error('Export Error:', err);
       this.toastr.error('خطأ 404: مسار التصدير غير موجود على السيرفر');
     }
+  });
+}
+
+editCampaign(campaign: Campaign) {
+  this.campaignService.openCampaign();
+  // لو عندك modal في home نفسها محتاج تعمل logic هنا
+  // بس بما إن الـ modal موجود في campaign component
+  // الأسهل تروح لصفحة الحملات وتفتح الـ edit modal
+  this.router.navigate(['/campaigns'], { 
+    state: { editCampaign: campaign } 
+  });
+}
+
+deleteCampaign(campaignId: string) {
+  const campaign = this.campaigns().find(c => c.id === campaignId);
+  const campaignNum = campaign?.campaignNumber ?? campaignId;
+
+  Swal.fire({
+    title: `هل تريد حذف الحملة #${campaignNum}؟`,
+    text: 'لا يمكن التراجع بعد الحذف',
+    imageUrl: '/HabashyBblood.jpg',
+    imageWidth: 120,
+    imageHeight: 120,
+    imageAlt: 'Habashy Blood',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#9ca3af',
+    confirmButtonText: 'حذف',
+    cancelButtonText: 'إلغاء',
+    background: '#fff',
+  }).then(result => {
+    if (!result.isConfirmed) return;
+
+    this.campaignService.deleteCampaign(campaignId).subscribe({
+      next: () => {
+        this.toastr.success('تم حذف الحملة بنجاح');
+        this.campaigns.update(list => list.filter(c => c.id !== campaignId));
+      },
+      error: (err: any) => this.toastr.error(err?.error?.message || 'فشل الحذف')
+    });
   });
 }
 }

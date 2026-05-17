@@ -76,13 +76,19 @@
   <i class="fa-solid fa-file-export"></i>
 </button>
 
-    <button class="p-2 hover:bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-blue-500 transition-all">
-      <i class="fa-solid fa-pen-to-square"></i>
-    </button>
+<button 
+  (click)="editCampaign(campaign); $event.stopPropagation()"
+  class="p-2 hover:bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-blue-500 transition-all"
+>
+  <i class="fa-solid fa-pen-to-square"></i>
+</button>
 
-    <button class="p-2 hover:bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-red-500 transition-all">
-      <i class="fa-solid fa-trash"></i>
-    </button>
+<button 
+  (click)="deleteCampaign(campaign.id); $event.stopPropagation()"
+  class="p-2 hover:bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-red-500 transition-all"
+>
+  <i class="fa-solid fa-trash"></i>
+</button>
   </div>
 </td>
               </tr>

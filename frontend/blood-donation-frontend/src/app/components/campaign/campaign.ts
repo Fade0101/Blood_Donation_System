@@ -50,7 +50,10 @@ export class CampaignComponent implements OnInit {
   ngOnInit(): void {
     this.loadCampaigns();
     this.loadAllDonors();
-
+  const state = history.state;
+  if (state?.editCampaign) {
+    this.editCampaign(state.editCampaign);
+  }
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (id) this.loadCampaignDonors(id);
