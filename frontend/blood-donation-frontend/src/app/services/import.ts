@@ -5,9 +5,8 @@ import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class ImportService {
 
-  private baseUrl = `${environment.baseurl}/api/imports`;
-
-  constructor(private http: HttpClient) {}
+  private baseUrl = `${environment.apiUrl}/imports`;
+  constructor(private http: HttpClient) { }
 
   importBloodBank(file: File) {
     const formData = new FormData();
