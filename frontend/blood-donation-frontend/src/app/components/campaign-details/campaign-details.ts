@@ -1,13 +1,16 @@
 import { Component, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormBuilder } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { finalize } from 'rxjs';
+import { finalize, lastValueFrom } from 'rxjs';
 import { CampaignService } from '../../services/campaignService';
 import { CampaignOperationsService } from '../../services/campaign-operations';
 import { OfflineService } from '../../services/offline';
-
+import { Validators } from '@angular/forms';
+import { DonorsService } from '../../services/donorsService';
+import { CreateDonorRequest } from '../../interfaces/donor-interface';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-campaign-details',
   standalone: true,
@@ -22,7 +25,8 @@ export class CampaignDetailsComponent implements OnInit {
   private toastr = inject(ToastrService);
   private offlineService = inject(OfflineService);
   private platformId = inject(PLATFORM_ID);
-
+private fb = inject(FormBuilder);
+private donorsService = inject(DonorsService);
   // --- Signals ---
   loading = signal(false);
   isOnline = signal(true);
@@ -212,10 +216,22 @@ export class CampaignDetailsComponent implements OnInit {
   async removeDonor(donor: any) {
     const donorId = donor.nationalId?.toString() || donor.id?.toString();
     if (!donorId) return;
+  const result = await Swal.fire({
+    title: 'هل تريد إزالة المتبرع؟',
+    text: `سيتم إزالة ${donor.name} من الحملة`,
+    imageUrl: '/HabashyBblood.jpg',
+    imageWidth: 120,
+    imageHeight: 120,
+    imageAlt: 'Habashy Blood',
+    showCancelButton: true,
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#9ca3af',
+    confirmButtonText: 'إزالة',
+    cancelButtonText: 'إلغاء',
+    background: '#fff',
+  });
 
-    if (!confirm(`هل أنت متأكد من إزالة ${donor.name} من الحملة؟`)) {
-      return;
-    }
+  if (!result.isConfirmed) return;
 
     // If offline, try to see if it's an offline addition and just remove it locally
     if (!this.isOnline()) {
@@ -259,28 +275,40 @@ export class CampaignDetailsComponent implements OnInit {
     });
   }
 
-  async syncOfflineData() {
-    const pendingActions = await this.offlineService.getAllSteps();
-    if (pendingActions.length === 0) return;
+ async syncOfflineData() {
+  const pendingActions = await this.offlineService.getAllSteps();
+  if (pendingActions.length === 0) return;
 
-    for (const action of pendingActions) {
+  let syncCount = 0;
+
+  for (const action of pendingActions) {
+    try {
       if (action.data.syncType === 'CAMPAIGN_REMOVE') {
-        this.opsService.removeDonorFromCampaign(this.campaignId, action.data.nationalId).subscribe({
-          next: () => {
-            this.offlineService.deleteStep(action.id!);
-            this.loadCampaignDonors();
-          }
-        });
+        await lastValueFrom(this.opsService.removeDonorFromCampaign(this.campaignId, action.data.nationalId));
       } else {
-        this.opsService.registerDonorToCampaign(this.campaignId, action.data).subscribe({
-          next: () => {
-            this.offlineService.deleteStep(action.id!);
-            this.loadCampaignDonors();
-          }
-        });
+        // محاولة تسجيل المتبرع في الحملة
+        await lastValueFrom(this.opsService.registerDonorToCampaign(this.campaignId, action.data));
+      }
+      
+      // لو الخطوة نجحت، امسحها من الـ Offline DB
+      await this.offlineService.deleteStep(action.id!);
+      syncCount++;
+
+    } catch (err: any) {
+      // لو المتبرع موجود فعلاً (Conflict 409)، امسحه من الـ Offline DB بصمت
+      if (err.status === 409 || (err.status === 400 && err.error?.message?.includes('exists'))) {
+        await this.offlineService.deleteStep(action.id!);
+      } else {
+        console.error('Sync failed for item:', action.id, err);
       }
     }
   }
+
+  if (syncCount > 0) {
+    this.loadCampaignDonors();
+    this.toastr.success(`تم مزامنة ${syncCount} من الإجراءات المعلقة`);
+  }
+}
 
   // --- Helpers ---
   isInCampaign(donor: any): boolean {
@@ -316,5 +344,81 @@ export class CampaignDetailsComponent implements OnInit {
       a.click();
       window.URL.revokeObjectURL(url);
     });
+
+
+
+
   }
+
+showAddDonorModal = false;
+
+donorForm = this.fb.group({
+  nationalId: ['', [Validators.required, Validators.minLength(14), Validators.maxLength(14)]],
+  name: ['', Validators.required],
+  phone: ['', Validators.required],
+  address: [''],
+  dateOfBirth: [null],
+  bloodType: [''],
+  gender: [''],
+  church: [''],
+  confessionFather: [''],
+});
+
+openAddDonorModal() {
+  this.showAddDonorModal = true;
+}
+
+closeAddDonorModal() {
+  this.showAddDonorModal = false;
+  this.donorForm.reset();
+}
+
+saveNewDonor() {
+  if (this.donorForm.invalid) {
+    this.donorForm.markAllAsTouched();
+    this.toastr.warning('من فضلك أكمل البيانات المطلوبة');
+    return;
+  }
+
+  const v = this.donorForm.value;
+  const payload: any = {
+    ...v,
+    dateOfBirth: v.dateOfBirth ? new Date(v.dateOfBirth).toISOString() : undefined,
+    syncType: 'CAMPAIGN_ADD', // مهم جداً للمزامنة لاحقاً
+    isOffline: true           // عشان تميزه في الـ UI لو حبيت
+  };
+
+  if (this.isOnline()) {
+    // كود الـ Online بتاعك سليم
+    this.donorsService.createDonor(payload).subscribe({
+      next: (newDonor: any) => {
+        this.opsService.registerDonorToCampaign(this.campaignId, payload).subscribe({
+          next: () => {
+            this.toastr.success('تم الإضافة والتسجيل بالحملة 🎉');
+            this.loadData(); // تحديث الكل
+            this.closeAddDonorModal();
+          },
+          error: () => {
+            this.loadAllDonors();
+            this.closeAddDonorModal();
+          }
+        });
+      },
+      error: (err: any) => this.toastr.error(err?.error?.error || 'فشل إضافة المتبرع')
+    });
+  } else {
+    // تحسين الـ Offline: احفظه كخطوة مزامنة
+    this.offlineService.saveStep({ ...payload, campaignId: this.campaignId }).then(() => {
+      this.toastr.info('تم الحفظ أوفلاين وسيتم الرفع عند توفر الإنترنت');
+      
+      // تحديث القوائم محلياً فوراً
+      this.allDonors.update(list => [payload, ...list]);
+      this.campaignDonors.update(list => [payload, ...list]);
+      
+      this.closeAddDonorModal();
+    });
+  }
+}
+
+  
 }

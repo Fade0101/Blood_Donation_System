@@ -100,9 +100,13 @@ async syncData() {
       syncCount++;
       console.log('✅ Synced donor:', item.data.name);
     } catch (err: any) {
-      if (err.status === 400 && (err.error?.message?.includes('already exists') || err.error?.error?.includes('already exists'))) {
+      // تعديل هنا لمعالجة الـ Conflict (409) أو الـ Duplicate (400)
+      if (err.status === 409 || (err.status === 400 && err.error?.message?.includes('exists'))) {
+        
+        // المتبرع موجود فعلاً على السيرفر، نمسحه من الـ Offline عشان ميتكررش الخطأ
         await this.offlineService.clearPending(item.id!);
-        console.log('ℹ️ Donor already exists, cleared from local:', item.data.name);
+        console.warn('⚠️ المتبرع موجود مسبقاً، تم حذفه من القائمة المحلية:', item.data.name);
+        
       } else {
         console.error('❌ Sync failed for:', item.data.name, err);
       }

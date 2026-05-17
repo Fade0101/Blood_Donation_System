@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CampaignDonorsResponse, RegisterDonorRequest, RegisterDonorResponse } from '../interfaces/campaign';
@@ -11,13 +11,25 @@ export class CampaignOperationsService {
   private http = inject(HttpClient);
 
 private apiUrl = `${environment.baseurl}/api/campaigns`;
-  registerDonorToCampaign(
-    campaignId: string,
-    payload: RegisterDonorRequest,
-  ): Observable<RegisterDonorResponse> {
-    return this.http.post<RegisterDonorResponse>(`${this.apiUrl}/${campaignId}/register`, payload);
-  }
 
+
+registerDonorToCampaign(
+  campaignId: string,
+  payload: RegisterDonorRequest,
+  skipInterceptor = false
+): Observable<RegisterDonorResponse> {
+  let headers = new HttpHeaders();
+  if (skipInterceptor) {
+    headers = headers.set('X-Skip-Error-Interceptor', 'true');
+  }
+  return this.http.post<RegisterDonorResponse>(
+    `${this.apiUrl}/${campaignId}/register`, 
+    payload,
+    { headers }
+  );
+}
+
+  
   removeDonorFromCampaign(campaignId: string, nationalId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${campaignId}/donors/${nationalId}`);
   }
