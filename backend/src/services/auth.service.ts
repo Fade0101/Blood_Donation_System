@@ -27,11 +27,19 @@ interface JwtPayload {
   role: Role;
 }
 
+interface RegisterResponse {
+  user: {
+    id: string;
+    email: string;
+    role: Role;
+  };
+}
+
 export class AuthService {
   private readonly jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
   private readonly jwtExpiry = '7d';
 
-  async register(payload: RegisterPayload): Promise<AuthResponse> {
+  async register(payload: RegisterPayload): Promise<RegisterResponse> {
     const { email, password } = payload;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -49,15 +57,12 @@ export class AuthService {
       },
     });
 
-    const token = this.generateToken(user.id, user.role);
-
     return {
       user: {
         id: user.id,
         email: user.email,
         role: user.role,
       },
-      token,
     };
   }
 

@@ -44,6 +44,7 @@ export class RegisterComponent {
     this.isLoading.set(true);
     this.authService.register(this.email(), this.password()).subscribe({
       next: () => {
+        this.isLoading.set(false);
         this.registrationSuccess.set(true);
         this.toastr.success('Registration successful! Waiting for admin approval.');
       },
