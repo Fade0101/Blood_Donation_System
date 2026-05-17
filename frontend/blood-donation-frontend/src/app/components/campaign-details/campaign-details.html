@@ -16,6 +16,9 @@
         <button (click)="exportCSV()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl shadow transition-all active:scale-95">
           Export CSV
         </button>
+        <button (click)="openAddDonorModal()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-xl shadow transition-all active:scale-95">
+  <i class="fa-solid fa-plus ml-2"></i> إضافة متبرع جديد
+</button>
       </div>
     </div>
 
@@ -188,3 +191,141 @@
     </div>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+@if (showAddDonorModal) {
+  <div class="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl p-8 relative">
+      <!-- Close -->
+      <button (click)="closeAddDonorModal()" class="absolute top-4 left-4 text-gray-500 hover:text-red-600">
+        ✖
+      </button>
+      <div class="flex justify-center mb-5">
+        <div class="relative">
+          <img
+            src="/HabashyBblood.jpg"
+            class="w-24 h-24 rounded-3xl object-cover shadow-xl border-4 border-red-100"
+          />
+          <div
+            class="absolute -bottom-2 -right-2 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
+          >
+            <i class="fa-solid fa-droplet text-sm"></i>
+          </div>
+        </div>
+      </div>
+      <!-- Title -->
+      <h2 class="text-2xl font-bold text-red-700 mb-6">
+    إضافة متبرع جديد
+      </h2>
+      <!-- Form -->
+      <form
+        [formGroup]="donorForm"
+        (ngSubmit)="saveNewDonor()"
+        class="grid grid-cols-1 md:grid-cols-2 gap-5"
+      >
+        <!-- NAME -->
+        <div>
+          <label class="label">الاسم</label>
+          <input
+            formControlName="name"
+            class="input"
+            [class.input-error]="donorForm.get('name')?.invalid && donorForm.get('name')?.touched"
+            placeholder="أدخل الاسم"
+          />
+          @if (donorForm.get('name')?.touched && donorForm.get('name')?.invalid) {
+            <div class="error-text">الاسم مطلوب</div>
+          }
+        </div>
+        <!-- PHONE -->
+        <div>
+          <label class="label">رقم الهاتف</label>
+          <input
+            formControlName="phone"
+            class="input"
+            [class.input-error]="donorForm.get('phone')?.invalid && donorForm.get('phone')?.touched"
+            placeholder="01xxxxxxxxx"
+          />
+          @if (donorForm.get('phone')?.touched && donorForm.get('phone')?.invalid) {
+            <div class="error-text">رقم الهاتف مطلوب</div>
+          }
+        </div>
+        <!-- NATIONAL ID -->
+        <div>
+          <label class="label">الرقم القومي</label>
+          <input
+            formControlName="nationalId"
+            class="input"
+            [class.input-error]="
+              donorForm.get('nationalId')?.invalid && donorForm.get('nationalId')?.touched
+            "
+            placeholder="14 رقم"
+          />
+          @if (donorForm.get('nationalId')?.touched && donorForm.get('nationalId')?.invalid) {
+            <div class="error-text">الرقم القومي لازم يكون 14 رقم</div>
+          }
+        </div>
+        <!-- BLOOD TYPE -->
+        <div>
+          <label class="label">فصيلة الدم</label>
+          <select formControlName="bloodType" class="input">
+            <option value="">اختار الفصيلة</option>
+            <option value="A_POS">A+</option>
+            <option value="A_NEG">A-</option>
+            <option value="B_POS">B+</option>
+            <option value="B_NEG">B-</option>
+            <option value="AB_POS">AB+</option>
+            <option value="AB_NEG">AB-</option>
+            <option value="O_POS">O+</option>
+            <option value="O_NEG">O-</option>
+          </select>
+        </div>
+        <!-- GENDER -->
+        <div>
+          <label class="label">النوع</label>
+          <select formControlName="gender" class="input">
+            <option value="">غير محدد</option>
+            <option value="MALE">ذكر</option>
+            <option value="FEMALE">أنثى</option>
+          </select>
+        </div>
+        <!-- DATE -->
+        <div>
+          <label class="label">تاريخ الميلاد</label>
+          <input type="date" formControlName="dateOfBirth" class="input" />
+        </div>
+        <!-- ADDRESS -->
+        <div>
+          <label class="label">العنوان</label>
+          <input formControlName="address" class="input" placeholder="العنوان" />
+        </div>
+        <!-- CHURCH -->
+        <div>
+          <label class="label">الكنيسة</label>
+          <input formControlName="church" class="input" placeholder="الكنيسة" />
+        </div>
+        <!-- CONFESSION FATHER -->
+        <div class="md:col-span-2">
+          <label class="label">أب الاعتراف</label>
+          <input formControlName="confessionFather" class="input" placeholder="أب الاعتراف" />
+        </div>
+        <!-- BUTTON -->
+        <div class="md:col-span-2">
+          <button type="submit" class="btn-primary w-full" [disabled]="donorForm.invalid">
+             إضافة متبرع
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,217 +1,190 @@
-<div
-  class="min-h-screen bg-[#f8fafc] font-sans selection:bg-red-100 selection:text-red-700"
-  dir="rtl"
+<div class="min-h-screen bg-[#f8fafc] font-sans text-right" dir="rtl" style="font-family: 'Tajawal', sans-serif">
+  
+  <div class="relative bg-slate-900 h-[500px] overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/20 to-slate-900 z-10"></div>
+
+    <swiper-container class="h-full" pagination="true" effect="fade" loop="true" autoplay-delay="4000" dir="rtl">
+      @for (img of ['/img1.jpg', '/img2.jpg', '/img3.jpg' , '/img4.jpg', '/img5.jpg' , '/img6.jpg']; track img) {
+      <swiper-slide class="relative">
+        <img [src]="img" class="absolute inset-0 w-full h-full object-cover" />
+        <div class="absolute bottom-16 right-12 z-20 max-w-lg animate-fade-in-up">
+          <div class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/20 shadow-2xl">
+            <span class="bg-[#fda4af] text-slate-900 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Habashy Blood Donation</span>
+            <h3 class="text-4xl font-extrabold text-white mt-4 leading-tight">حملة تبرع الحيشي</h3>
+            <!-- <p class="text-white/70 mt-2 font-light">نحن هنا لإنقاذ الأرواح. انضم إلينا في شهر ديسمبر ٢٠٢٦ وكن جزءاً من التغيير.</p> -->
+            <!-- <div class="flex gap-4 mt-6">
+              <button class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all">سجل كمتبرع الآن</button>
+              <button class="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl font-bold text-sm border border-white/10 transition-all">تفاصيل الحملة</button>
+            </div> -->
+          </div>
+        </div>
+      </swiper-slide>
+      }
+    </swiper-container>
+  </div>
+
+  <div class="max-w-screen-2xl mx-auto px-8 -mt-12 relative z-30 pb-20">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+      
+      <div class="xl:col-span-2 bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        <div class="flex items-center justify-between px-8 py-6 border-b border-slate-50">
+          <div>
+            <h2 class="text-xl font-black text-slate-800">إدارة الحملات</h2>
+            <p class="text-slate-400 text-xs mt-1">تتبع حالة الحملات الجارية والمستقبلية</p>
+          </div>
+          <button routerLink="/campaigns" (click)="openNewCampaign()" class="group flex items-center gap-3 bg-slate-900 hover:bg-red-600 text-white px-5 py-3 rounded-2xl transition-all shadow-lg shadow-slate-200">
+            <i class="fa-solid fa-plus text-xs group-hover:rotate-90 transition-transform"></i>
+            <span class="text-sm font-bold">إنشاء حملة جديدة</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-slate-50/50">
+                <th class="px-8 py-4 text-right text-slate-500 font-bold text-xs uppercase tracking-wider">المعرف</th>
+                <th class="px-4 py-4 text-right text-slate-500 font-bold text-xs uppercase tracking-wider">المركز الطبي</th>
+                <th class="px-4 py-4 text-right text-slate-500 font-bold text-xs uppercase tracking-wider">التاريخ</th>
+                <!-- <th class="px-4 py-4 text-right text-slate-500 font-bold text-xs uppercase tracking-wider">الحالة</th> -->
+                <th class="px-8 py-4 text-left text-slate-500 font-bold text-xs uppercase tracking-wider">التحكم</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+              @for (campaign of campaigns(); track campaign.id) {
+              <tr class="group hover:bg-slate-50/80 transition-all">
+                <td class="px-8 py-5">
+                  <span class="font-mono font-bold text-red-600">#{{ campaign.campaignNumber }}</span>
+                </td>
+                <td class="px-4 py-5">
+                  <div class="flex flex-col">
+                    <span class="text-slate-700 font-bold text-sm">{{ campaign.bloodBankName }}</span>
+                    <span class="text-slate-400 text-[10px]">{{ campaign.supervisorName }}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-5">
+                  <span class="text-slate-600 text-xs font-medium">{{ campaign.startDate | date:'mediumDate' }}</span>
+                </td>
+
+               <td class="px-8 py-5 text-left">
+  <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+    
+<button 
+  (click)="exportCSV(campaign.id)" 
+  title="تصدير بيانات المتبرعين"
+  class="p-2 hover:bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-[#10b981] transition-all"
 >
-  <section class="relative bg-slate-900 pt-20 pb-40 text-white overflow-hidden shadow-2xl">
-    <div class="absolute inset-0 z-0">
-      <div
-        class="absolute top-0 left-0 w-[500px] h-[500px] bg-red-600/10 blur-[120px] rounded-full -translate-x-1/2 -translate-y-1/2"
-      ></div>
+  <i class="fa-solid fa-file-export"></i>
+</button>
+
+<button 
+  (click)="editCampaign(campaign); $event.stopPropagation()"
+  class="p-2 hover:bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-blue-500 transition-all"
+>
+  <i class="fa-solid fa-pen-to-square"></i>
+</button>
+
+<button 
+  (click)="deleteCampaign(campaign.id); $event.stopPropagation()"
+  class="p-2 hover:bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-red-500 transition-all"
+>
+  <i class="fa-solid fa-trash"></i>
+</button>
+  </div>
+</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+<div class="space-y-6">
+  
+  <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50">
+    <div class="mb-5">
+      <h3 class="text-lg font-black text-slate-800">استيراد البيانات</h3>
+      <p class="text-slate-400 text-[10px] mt-1">اختر نوع البيانات المراد رفعها للنظام</p>
     </div>
 
-    <div class="max-w-7xl mx-auto px-6 relative z-10">
-      <div class="flex flex-col md:flex-row justify-between items-end gap-8">
-        <div class="space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="p-2 bg-red-600 rounded-lg shadow-lg shadow-red-600/20">
-              <i class="fa-solid fa-droplet text-xl text-white"></i>
-            </div>
-            <h2 class="text-lg font-medium text-slate-400">Habashy Admin Panel</h2>
-          </div>
-          <h1 class="text-4xl md:text-5xl font-black leading-tight">
-            أهلاً بك، <span class="text-red-500">فى حملة تبرع الحبشي</span> 👋<br />
-            <span class="text-slate-300 text-2xl font-light">إليك ملخص حالة التبرعات اليوم</span>
-          </h1>
+    <div class="space-y-3">
+      <div 
+        (click)="fileInput.click()" 
+        class="group flex items-center gap-4 p-4 rounded-2xl border border-slate-50 bg-slate-50/50 hover:bg-blue-50 hover:border-blue-100 cursor-pointer transition-all"
+      >
+        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:bg-blue-500 transition-colors">
+          <i class="fa-solid fa-file-csv text-blue-500 group-hover:text-white"></i>
         </div>
-
-        <div
-          class="flex flex-wrap gap-3 bg-white/5 p-2 rounded-2xl backdrop-blur-md border border-white/10"
-        >
-          <button
-            class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-red-900/40"
-          >
-            <i class="fa-solid fa-plus"></i>
-            حملة جديدة
-          </button>
-          <button
-            class="hover:bg-white/10 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 disabled:opacity-50"
-            (click)="fileInput.click()"
-            [disabled]="importLoading()"
-          >
-            <i class="fa-solid fa-file-import text-slate-400"></i>
-
-            @if (!importLoading()) {
-              <span>استيراد CSV</span>
-            } @else {
-              <span>جاري الاستيراد...</span>
-            }
-          </button>
-          <button
-            class="hover:bg-white/10 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 disabled:opacity-50"
-            (click)="legacyFileInput.click()"
-            [disabled]="importLoading()"
-          >
-            <i class="fa-solid fa-database text-slate-400"></i>
-
-            @if (!importLoading()) {
-              <span>استيراد متبرعين جدد</span>
-            } @else {
-              <span>جاري الاستيراد...</span>
-            }
-          </button>
-
-          <input
-            type="file"
-            #legacyFileInput
-            hidden
-            accept=".csv"
-            (change)="onLegacyFileSelected($event)"
-          />
-
-          <input type="file" #fileInput hidden accept=".csv" (change)="onFileSelected($event)" />
-          <button
-            class="hover:bg-white/10 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2"
-          >
-            <i class="fa-solid fa-file-export text-slate-400"></i>
-            تصدير تقرير
-          </button>
+        <div class="flex-1">
+          <p class="text-sm font-bold text-slate-700 group-hover:text-blue-700 transition-colors">بيانات الحملات</p>
+          <p class="text-[10px] text-slate-400">Campaigns Info</p>
         </div>
+        <i class="fa-solid fa-chevron-left text-[10px] text-slate-300 group-hover:translate-x-[-5px] transition-transform"></i>
       </div>
+
+      <div 
+        (click)="legacyFileInput.click()" 
+        class="group flex items-center gap-4 p-4 rounded-2xl border border-slate-50 bg-slate-50/50 hover:bg-purple-50 hover:border-purple-100 cursor-pointer transition-all"
+      >
+        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:bg-purple-500 transition-colors">
+          <i class="fa-solid fa-users-line text-purple-500 group-hover:text-white"></i>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-bold text-slate-700 group-hover:text-purple-700 transition-colors">قاعدة المتبرعين</p>
+          <p class="text-[10px] text-slate-400">New Donors List</p>
+        </div>
+        <i class="fa-solid fa-chevron-left text-[10px] text-slate-300 group-hover:translate-x-[-5px] transition-transform"></i>
+      </div>
+
+      <input type="file" #fileInput hidden accept=".csv" (change)="onFileSelected($event)" />
+      <input type="file" #legacyFileInput hidden accept=".csv" (change)="onLegacyFileSelected($event)" />
     </div>
-  </section>
-  <section class="max-w-7xl mx-auto px-6 -mt-20 relative z-20">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div
-        class="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-white flex items-center gap-5 group hover:border-red-200 transition-all cursor-default"
-      >
-        <div
-          class="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"
-        >
-          <i class="fa-solid fa-users text-2xl text-red-600"></i>
-        </div>
-        <div>
-          <p class="text-slate-500 text-sm font-medium">إجمالي المتبرعين</p>
-          <h3 class="text-2xl font-black text-slate-800">{{ totalDonors() }}</h3>
-        </div>
-      </div>
 
-      <div
-        class="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-white flex items-center gap-5 group hover:border-red-200 transition-all cursor-default"
-      >
-        <div
-          class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"
-        >
-          <i class="fa-solid fa-bullhorn text-2xl text-blue-600"></i>
-        </div>
-        <div>
-          <p class="text-slate-500 text-sm font-medium">حملات نُظمت</p>
-          <h3 class="text-2xl font-black text-slate-800">{{ campaigns().length }}</h3>
-        </div>
-      </div>
-
-      <div
-        class="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-white flex items-center gap-5 group hover:border-red-200 transition-all cursor-default"
-      >
-        <div
-          class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"
-        >
-          <i class="fa-solid fa-circle-check text-2xl text-green-600"></i>
-        </div>
-        <div>
-          <p class="text-slate-500 text-sm font-medium">حملات نشطة</p>
-          <h3 class="text-2xl font-black text-slate-800">4</h3>
-        </div>
-      </div>
-
-      <div
-        class="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 border border-white flex items-center gap-5 group hover:border-red-200 transition-all cursor-default"
-      >
-        <div
-          class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform"
-        >
-          <i class="fa-solid fa-vial text-2xl text-orange-600"></i>
-        </div>
-        <div>
-          <p class="text-slate-500 text-sm font-medium">مخزون الدم (وحدة)</p>
-          <h3 class="text-2xl font-black text-slate-800">560</h3>
-        </div>
-      </div>
+    <div class="mt-4 p-3 bg-amber-50/50 border border-amber-100 rounded-2xl flex gap-3 items-start">
+      <i class="fa-solid fa-circle-info text-amber-500 text-xs mt-0.5"></i>
+      <p class="text-[10px] text-amber-700 leading-relaxed">
+        يرجى التأكد أن الملف بصيغة <span class="font-bold">CSV</span> وبترميز <span class="font-bold">UTF-8</span> لضمان ظهور الأسماء العربية بشكل صحيح.
+      </p>
     </div>
-  </section>
-  <section class="max-w-7xl mx-auto px-6 py-16">
-    <div class="flex flex-col lg:flex-row gap-8">
-      <div class="lg:w-2/3 space-y-8">
-        <div class="flex items-center justify-between">
-          <h3 class="text-2xl font-bold text-slate-800">أدوات الإدارة السريعة</h3>
-          <div class="h-px bg-slate-200 flex-grow mx-6"></div>
-        </div>
+  </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div
-            class="p-1 bg-white rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-md transition-all"
-          >
-            <div class="p-6">
-              <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center mb-4">
-                <i class="fa-solid fa-magnifying-glass text-slate-600"></i>
-              </div>
-              <h4 class="font-bold text-lg text-slate-800 mb-2">بحث ذكي</h4>
-              <p class="text-slate-500 text-sm mb-6">
-                ابحث في قاعدة البيانات عن متبرع بالاسم، الفصيلة، أو الكنيسة.
-              </p>
-              <button
-                class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition-all"
-              >
-                فتح السجل
-              </button>
-            </div>
-          </div>
+ <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 relative overflow-hidden group">
+  <div class="absolute -right-10 -top-10 w-32 h-32 bg-slate-50 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
 
-          <div
-            class="p-1 bg-white rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-md transition-all"
-          >
-            <div class="p-6">
-              <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center mb-4">
-                <i class="fa-solid fa-calendar-plus text-red-600"></i>
-              </div>
-              <h4 class="font-bold text-lg text-slate-800 mb-2">جدولة حملة</h4>
-              <p class="text-slate-500 text-sm mb-6">
-                حدد موعد ومكان الحملة القادمة وقم بدعوة المتبرعين تلقائياً.
-              </p>
-              <button
-                class="w-full py-3 border-2 border-red-100 text-red-700 rounded-xl font-bold hover:bg-red-50 transition-all"
-              >
-                تحديد موعد
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="lg:w-1/3 space-y-8">
-        <h3 class="text-2xl font-bold text-slate-800 text-right">تنبيهات هامة</h3>
-
-        <div class="bg-white rounded-[2rem] p-6 shadow-sm border-r-4 border-r-orange-400">
-          <div class="flex gap-4">
-            <i class="fa-solid fa-triangle-exclamation text-orange-500 text-xl"></i>
-            <div>
-              <h5 class="font-bold text-slate-800">نقص في فصيلة O-</h5>
-              <p class="text-slate-500 text-sm mt-1">
-                المخزون أقل من 10 وحدات. يفضل إطلاق حملة مصغرة.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-[2rem] p-6 shadow-sm border-r-4 border-r-blue-400">
-          <div class="flex gap-4">
-            <i class="fa-solid fa-info-circle text-blue-500 text-xl"></i>
-            <div>
-              <h5 class="font-bold text-slate-800">آخر متبرع</h5>
-              <p class="text-slate-500 text-sm mt-1">تمت إضافة "مينا نبيل" منذ 15 دقيقة.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="relative z-10">
+    <div class="mb-5">
+      <h3 class="text-lg font-black text-slate-800"> منصاتنا</h3>
     </div>
-  </section>
+
+    <div class="grid grid-cols-2 gap-3">
+      <a href="https://www.facebook.com/share/1CYjd17xHJ/" target="_blank" class="flex items-center gap-3 p-3 rounded-2xl bg-[#1877F2]/5 border border-[#1877F2]/10 hover:bg-[#1877F2] hover:text-white transition-all group/item">
+        <i class="fa-brands fa-facebook-f text-[#1877F2] group-hover/item:text-white text-sm"></i>
+        <span class="text-xs font-bold text-slate-700 group-hover/item:text-white">فيسبوك</span>
+      </a>
+
+      <a href="https://www.instagram.com/habashybdc?igsh=MW92YXVxNHhhbmFzbA==" target="_blank" class="flex items-center gap-3 p-3 rounded-2xl bg-[#E4405F]/5 border border-[#E4405F]/10 hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:via-[#ee2a7b] hover:to-[#6228d7] hover:text-white transition-all group/item">
+        <i class="fa-brands fa-instagram text-[#E4405F] group-hover/item:text-white text-sm"></i>
+        <span class="text-xs font-bold text-slate-700 group-hover/item:text-white">انستجرام</span>
+      </a>
+
+      <a href="https://x.com/habashybdc?s=21" target="_blank" class="flex items-center gap-3 p-3 rounded-2xl bg-black/5 border border-black/10 hover:bg-black hover:text-white transition-all group/item">
+        <i class="fa-brands fa-x-twitter text-black group-hover/item:text-white text-sm"></i>
+        <span class="text-xs font-bold text-slate-700 group-hover/item:text-white">تويتر</span>
+      </a>
+
+      <a href="https://www.tiktok.com/@habashybdc?_r=1&_t=ZS-96QyrsPGKXt" target="_blank" class="flex items-center gap-3 p-3 rounded-2xl bg-[#000000]/5 border border-[#000000]/10 hover:bg-[#000000] hover:text-white transition-all group/item">
+        <i class="fa-brands fa-tiktok text-[#000000] group-hover/item:text-white text-sm"></i>
+        <span class="text-xs font-bold text-slate-700 group-hover/item:text-white">تيك توك</span>
+      </a>
+    </div>
+
+    <button class="w-full mt-6 bg-slate-100 text-slate-600 py-3 rounded-2xl font-bold text-xs hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2">
+      <i class="fa-solid fa-share-nodes text-[10px]"></i>
+      مشاركة رابط المنصة
+    </button>
+  </div>
+</div>
+
+</div>
+
+    </div>
+  </div>
 </div>
