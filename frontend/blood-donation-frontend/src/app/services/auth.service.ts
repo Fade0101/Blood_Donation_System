@@ -18,6 +18,14 @@ export interface AuthResponse {
   };
 }
 
+export interface RegisterResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: User;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -56,11 +64,10 @@ export class AuthService {
   constructor(private http: HttpClient) {
   }
 
-  register(email: string, password: string): Observable<AuthResponse> {
+  register(email: string, password: string): Observable<RegisterResponse> {
     this.isLoadingSignal.set(true);
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { email, password }).pipe(
-      tap(response => {
-        this.setAuthData(response.data.user, response.data.token);
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, { email, password }).pipe(
+      tap(() => {
         this.isLoadingSignal.set(false);
       })
     );
