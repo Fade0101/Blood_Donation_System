@@ -117,38 +117,37 @@ openModal() {
   this.campaignService.closeCampaign();
   this.campaignForm.reset();
 }
-  submitCampaign() {
-    if (this.campaignForm.invalid) return;
+submitCampaign() {
+  if (this.campaignForm.invalid) return;
 
-    this.submitting.set(true);
+  this.submitting.set(true);
+  const v = this.campaignForm.getRawValue();
 
-    const v = this.campaignForm.value;
+  // خلي الـ payload نوعه UpdateCampaignRequest أو CreateCampaignRequest 
+  // طالما الحقول متطابقة
+  const payload: any = { 
+    campaignNumber: Number(v.campaignNumber),
+    bloodBankName: v.bloodBankName!,
+    supervisorName: v.supervisorName!,
+    startDate: v.startDate ? new Date(v.startDate).toISOString() : undefined,
+    endDate: v.endDate ? new Date(v.endDate).toISOString() : undefined,
+  };
 
-    const payload: CreateCampaignRequest = {
-      campaignNumber: Number(v.campaignNumber),
-      bloodBankName: v.bloodBankName!,
-      supervisorName: v.supervisorName!,
-      startDate: v.startDate ? new Date(v.startDate).toISOString() : undefined,
-      endDate: v.endDate ? new Date(v.endDate).toISOString() : undefined,
-    };
-
-    if (this.isEditMode()) {
-      this.campaignService.updateCampaign(this.selectedId()!, payload).subscribe({
-        next: (res) => {
-          this.toastr.success('تم التعديل بنجاح');
-          this.campaigns.update(list =>
-            list.map(c => c.id === res.id ? res : c)
-          );
-          this.resetForm();
-        },
-        error: (err) => {
-          console.error('Update Campaign Error:', err);
-          this.toastr.error('فشل التعديل');
-        }
-      });
-
-      return;
-    }
+  if (this.isEditMode()) {
+    this.campaignService.updateCampaign(this.selectedId()!, payload).subscribe({
+      next: (res) => {
+        this.toastr.success('تم التعديل بنجاح');
+        // تأكد إن السيرفر بيرجع الكائن المعدل كامل
+        this.loadCampaigns(); // أضمن طريقة لتحديث القائمة بعد التعديل
+        this.resetForm();
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        this.toastr.error('فشل التعديل');
+      }
+    });
+    return;
+  }
 
     this.campaignService.createCampaign(payload).subscribe({
       next: (res) => {
@@ -188,17 +187,18 @@ openModal() {
     });
   }
 
-  editCampaign(c: Campaign) {
-    this.isEditMode.set(true);
-    this.selectedId.set(c.id);
-    this.showModal.set(true);
+editCampaign(c: Campaign) {
+  this.isEditMode.set(true);
+  this.selectedId.set(c.id);
+  this.showModal.set(true);
 
-    this.campaignForm.patchValue({
-      campaignNumber: c.campaignNumber,
-      bloodBankName: c.bloodBankName,
-      supervisorName: c.supervisorName,
-      startDate: c.startDate ? c.startDate.split('T')[0] : '',
-      endDate: c.endDate ? c.endDate.split('T')[0] : '',
-    });
-  }
+  this.campaignForm.patchValue({
+    // تأكد إن القيمة رقمية تماماً
+    campaignNumber: Number(c.campaignNumber), 
+    bloodBankName: c.bloodBankName,
+    supervisorName: c.supervisorName,
+    startDate: c.startDate ? c.startDate.split('T')[0] : '',
+    endDate: c.endDate ? c.endDate.split('T')[0] : '',
+  });
+}
 }
