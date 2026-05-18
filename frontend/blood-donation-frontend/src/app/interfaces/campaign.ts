@@ -21,6 +21,9 @@ startDate?: string
 endDate?: string
 }
 export interface UpdateCampaignRequest {
+  campaignNumber?: number; // ضيف ده
+  bloodBankName?: string;   // وضيف ده
+  supervisorName?: string; // وضيف ده
   title?: string;
   description?: string;
   location?: string;

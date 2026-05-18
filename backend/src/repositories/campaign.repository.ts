@@ -5,18 +5,20 @@ import { CreateCampaignDTO, UpdateCampaignDTO } from "../types/campaign.types";
 
 export const registerDonorToCampaign = async (
   campaignId: string,
-  donorData: any
+  donorData: any,
 ) => {
   return await prisma.$transaction(async (tx) => {
     // 1. Try to find the donor using only the National ID (Our absolute source of truth)
     let donor = await tx.donor.findUnique({
-      where: { nationalId: donorData.nationalId }
+      where: { nationalId: donorData.nationalId },
     });
 
     // 2. The Smart Check
     if (!donor) {
       if (!donorData.name || !donorData.phone) {
-        throw new Error("هذا المتبرع غير مسجل من قبل. يرجى إدخال البيانات كاملة.");
+        throw new Error(
+          "هذا المتبرع غير مسجل من قبل. يرجى إدخال البيانات كاملة.",
+        );
       }
 
       donor = await tx.donor.create({
@@ -25,21 +27,26 @@ export const registerDonorToCampaign = async (
           name: donorData.name,
           phone: donorData.phone,
           address: donorData.address || null,
-          dateOfBirth: donorData.dateOfBirth ? new Date(donorData.dateOfBirth) : null,
-          gender: donorData.gender || null
-        }
+          dateOfBirth: donorData.dateOfBirth
+            ? new Date(donorData.dateOfBirth)
+            : null,
+          gender: donorData.gender || null,
+        },
       });
     } else {
       // Safely update ONLY the fields that were provided
       const updateData: any = {};
-      if (donorData.phone && donorData.phone !== donor.phone) updateData.phone = donorData.phone;
-      if (donorData.address && donorData.address !== donor.address) updateData.address = donorData.address;
-      if (donorData.gender && donorData.gender !== donor.gender) updateData.gender = donorData.gender;
+      if (donorData.phone && donorData.phone !== donor.phone)
+        updateData.phone = donorData.phone;
+      if (donorData.address && donorData.address !== donor.address)
+        updateData.address = donorData.address;
+      if (donorData.gender && donorData.gender !== donor.gender)
+        updateData.gender = donorData.gender;
 
       if (Object.keys(updateData).length > 0) {
         donor = await tx.donor.update({
           where: { id: donor.id },
-          data: updateData
+          data: updateData,
         });
       }
     }
@@ -49,9 +56,9 @@ export const registerDonorToCampaign = async (
       where: {
         donorId_campaignId: {
           donorId: donor.id,
-          campaignId: campaignId
-        }
-      }
+          campaignId: campaignId,
+        },
+      },
     });
 
     if (existingRegistration) {
@@ -59,14 +66,16 @@ export const registerDonorToCampaign = async (
     }
 
     // 4. Register donor
-    const syncId = donorData.offlineSyncId ? donorData.offlineSyncId : crypto.randomUUID();
+    const syncId = donorData.offlineSyncId
+      ? donorData.offlineSyncId
+      : crypto.randomUUID();
 
     const registration = await tx.donorCampaign.create({
       data: {
         donorId: donor.id,
         campaignId: campaignId,
-        offlineSyncId: syncId
-      }
+        offlineSyncId: syncId,
+      },
     });
 
     return { donor, registration };
@@ -80,22 +89,22 @@ export const createCampaign = async (data: CreateCampaignDTO) => {
       startDate: new Date(data.startDate),
       endDate: data.endDate ? new Date(data.endDate) : null,
       bloodBankName: data.bloodBankName,
-      supervisorName: data.supervisorName
-    }
+      supervisorName: data.supervisorName,
+    },
   });
 };
 
 export const getAllCampaigns = async () => {
   return await prisma.campaign.findMany({
     orderBy: {
-      createdAt: 'desc'
-    }
+      createdAt: "desc",
+    },
   });
 };
 
 export const getCampaignById = async (id: string) => {
   return await prisma.campaign.findUnique({
-    where: { id }
+    where: { id },
   });
 };
 
@@ -103,39 +112,46 @@ export const updateCampaign = async (id: string, data: UpdateCampaignDTO) => {
   return await prisma.campaign.update({
     where: { id },
     data: {
+      campaignNumber: data.campaignNumber,
       startDate: data.startDate ? new Date(data.startDate) : undefined,
       endDate: data.endDate ? new Date(data.endDate) : undefined,
       bloodBankName: data.bloodBankName,
-      supervisorName: data.supervisorName
-    }
+      supervisorName: data.supervisorName,
+    },
   });
 };
 
 export const deleteCampaign = async (id: string) => {
   return await prisma.campaign.delete({
-    where: { id }
+    where: { id },
   });
 };
 
-export const getCampaignDonors = async (campaignId: string, bloodTypeFilter?: any) => {
+export const getCampaignDonors = async (
+  campaignId: string,
+  bloodTypeFilter?: any,
+) => {
   const registrations = await prisma.donorCampaign.findMany({
     where: {
       campaignId: campaignId,
-      ...(bloodTypeFilter && { donor: { bloodType: bloodTypeFilter } })
+      ...(bloodTypeFilter && { donor: { bloodType: bloodTypeFilter } }),
     },
     include: {
-      donor: true
-    }
+      donor: true,
+    },
   });
 
   return registrations;
 };
 
-export const removeDonorFromCampaign = async (campaignId: string, nationalId: string) => {
+export const removeDonorFromCampaign = async (
+  campaignId: string,
+  nationalId: string,
+) => {
   return await prisma.$transaction(async (tx) => {
     // 1. Find the donor by nationalId
     const donor = await tx.donor.findUnique({
-      where: { nationalId }
+      where: { nationalId },
     });
 
     if (!donor) {
@@ -147,9 +163,9 @@ export const removeDonorFromCampaign = async (campaignId: string, nationalId: st
       where: {
         donorId_campaignId: {
           donorId: donor.id,
-          campaignId: campaignId
-        }
-      }
+          campaignId: campaignId,
+        },
+      },
     });
 
     if (!existingRegistration) {
@@ -161,9 +177,9 @@ export const removeDonorFromCampaign = async (campaignId: string, nationalId: st
       where: {
         donorId_campaignId: {
           donorId: donor.id,
-          campaignId: campaignId
-        }
-      }
+          campaignId: campaignId,
+        },
+      },
     });
 
     return { success: true, message: "تمت إزالة المتبرع من الحملة بنجاح" };
