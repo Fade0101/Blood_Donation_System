@@ -10,6 +10,7 @@ export const createCampaignSchema = z.object({
 });
 
 export const updateCampaignSchema = z.object({
+  campaignNumber: z.number().int().positive().optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
   bloodBankName: z.string().optional(),
@@ -30,7 +31,18 @@ export const registerDonorSchema = z.object({
   phone: z.string().min(1).optional(),
   address: z.string().optional(),
   dateOfBirth: z.string().datetime().optional(),
-  bloodType: z.enum(["A_POS", "A_NEG", "B_POS", "B_NEG", "AB_POS", "AB_NEG", "O_POS", "O_NEG"]).optional(),
+  bloodType: z
+    .enum([
+      "A_POS",
+      "A_NEG",
+      "B_POS",
+      "B_NEG",
+      "AB_POS",
+      "AB_NEG",
+      "O_POS",
+      "O_NEG",
+    ])
+    .optional(),
   gender: z.enum(["MALE", "FEMALE"]).optional(),
   offlineSyncId: z.string().optional(),
 });

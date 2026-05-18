@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `{environment.apiUrl}`;
 
 async function debugAdminDashboard() {
   console.log('\n🔍 DEBUGGING ADMIN DASHBOARD\n');

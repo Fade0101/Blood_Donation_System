@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ImportService {
 
-  private baseUrl = 'http://localhost:5000/api/imports';
-
-  constructor(private http: HttpClient) {}
+  private baseUrl = `${environment.apiUrl}/imports`;
+  constructor(private http: HttpClient) { }
 
   importBloodBank(file: File) {
     const formData = new FormData();
